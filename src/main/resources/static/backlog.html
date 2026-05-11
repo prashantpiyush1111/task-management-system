@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TaskFlow — Backlog</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0b0f;--surface:#111318;--card:#161a22;--card2:#1c2130;--border:#1e2330;--accent:#4f7cff;--accent2:#7c5cfc;--success:#22c55e;--warning:#f59e0b;--danger:#ef4444;--text:#e8eaf0;--muted:#6b7280}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 0;position:fixed;top:0;left:0;bottom:0;z-index:50}
+.sl{display:flex;align-items:center;gap:9px;padding:0 16px 20px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.li{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.lt{font-size:17px;font-weight:700}.lt span{color:var(--accent)}
+.ns{padding:0 10px;margin-top:8px}
+.nl{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:0 8px;margin:12px 0 4px}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:500;transition:all .15s;cursor:pointer;position:relative}
+.ni:hover{background:var(--card);color:var(--text)}
+.ni.active{background:rgba(79,124,255,.1);color:var(--accent)}
+.ni.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--accent);border-radius:2px}
+.nico{font-size:15px;width:18px;text-align:center}
+.sf{margin-top:auto;padding:12px 10px 0;border-top:1px solid var(--border)}
+.uc{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;overflow:hidden}
+.av{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.un{font-size:11px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px}
+.logout-btn{width:100%;margin-top:6px;padding:9px;background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;text-align:left;display:flex;align-items:center;gap:8px}
+.logout-btn:hover{border-color:var(--danger);color:var(--danger)}
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+.page-title{font-size:18px;font-weight:700}
+.tb-right{display:flex;align-items:center;gap:10px}
+.tb-btn{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 14px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.tb-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tb-btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;font-weight:600}
+.content{padding:28px;flex:1}
+.top-row{display:flex;align-items:center;gap:12px;margin-bottom:22px;flex-wrap:wrap}
+.ri{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none}
+.ri:focus{border-color:var(--accent)}
+.rb{padding:8px 16px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
+.rb:hover{opacity:.88}
+.section{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:20px;overflow:hidden}
+.section-head{padding:14px 18px;background:var(--card2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.section-title{font-size:14px;font-weight:700}
+.section-meta{font-size:12px;color:var(--muted)}
+.issue-row{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--border);cursor:grab;transition:background .15s;user-select:none}
+.issue-row:hover{background:var(--card2)}
+.issue-row:last-child{border-bottom:none}
+.issue-row.dragging{opacity:.4;background:rgba(79,124,255,.05)}
+.issue-row.drag-over{border-top:2px solid var(--accent)}
+.drag-handle{color:var(--muted);font-size:14px;cursor:grab;flex-shrink:0}
+.issue-key{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);min-width:80px}
+.issue-title{flex:1;font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{display:inline-flex;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase}
+.badge.high{background:rgba(239,68,68,.12);color:#f87171}
+.badge.medium{background:rgba(245,158,11,.12);color:#fbbf24}
+.badge.low{background:rgba(34,197,94,.12);color:#4ade80}
+.badge.critical{background:rgba(124,92,252,.15);color:#c4b5fd}
+.badge.todo{background:rgba(107,114,128,.15);color:#9ca3af}
+.badge.inprog{background:rgba(79,124,255,.15);color:#93bbff}
+.badge.done{background:rgba(34,197,94,.15);color:#4ade80}
+.badge.open{background:rgba(56,189,248,.15);color:#7dd3fc}
+.assign-btn{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:11px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.assign-btn:hover{border-color:var(--accent);color:var(--accent)}
+.empty{text-align:center;padding:40px;color:var(--muted);font-size:13px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;z-index:200;padding:40px 20px}
+.overlay.show{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:460px;position:relative;animation:min .25s ease}
+@keyframes min{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:17px;font-weight:700}
+.mx{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px}.mx:hover{color:var(--text)}
+.fg{margin-bottom:14px}
+label{display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:6px;text-transform:uppercase;letter-spacing:.7px}
+input,select{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:10px 13px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
+input:focus,select:focus{border-color:var(--accent)}
+select option{background:var(--card2)}
+.mbtn{padding:10px 20px;border-radius:9px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.mbtn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff}
+.mbtn.ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.mbtn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+.alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none}
+.alert.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171}
+.alert.show{display:block}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sl"><div class="li">⚡</div><div class="lt">Task<span>Flow</span></div></div>
+  <div class="ns">
+    <div class="nl">Main</div>
+    <a class="ni" href="dashboard.html"><span class="nico">⊞</span>Dashboard</a>
+    <a class="ni" href="issues.html"><span class="nico">📋</span>Issues</a>
+    <a class="ni" href="board.html"><span class="nico">🗂</span>Board</a>
+    <a class="ni active" href="backlog.html"><span class="nico">📌</span>Backlog</a>
+    <div class="nl">Planning</div>
+    <a class="ni" href="sprints.html"><span class="nico">🏃</span>Sprints</a>
+    <a class="ni" href="reports.html"><span class="nico">📊</span>Reports</a>
+    <div class="nl">Settings</div>
+    <a class="ni" href="workflows.html"><span class="nico">🔄</span>Workflows</a>
+    <a class="ni" href="profile.html"><span class="nico">👤</span>Profile</a>
+  </div>
+  <div class="sf">
+    <div class="uc"><div class="av" id="sideAvatar">U</div><div><div class="un" id="sideEmail">—</div></div></div>
+    <button class="logout-btn" onclick="logout()">🚪 Sign Out</button>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <div class="page-title">Backlog</div>
+    <div class="tb-right">
+      <button class="tb-btn" onclick="loadHierarchy()">🌳 Hierarchy View</button>
+      <button class="tb-btn primary" onclick="openAssign()">+ Assign to Sprint</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="top-row">
+      <label style="color:var(--muted);font-size:13px;margin:0">Project ID:</label>
+      <input class="ri" type="number" id="projectIdInput" placeholder="Project ID" value="1" style="width:160px"/>
+      <button class="rb" onclick="loadBacklog()">Load Backlog</button>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">📌 Backlog Issues</div>
+        <div class="section-meta" id="backlogCount">—</div>
+      </div>
+      <div id="backlogList"><div class="empty">Enter Project ID and click Load Backlog</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="assignOverlay">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Assign Issue to Sprint</div><button class="mx" onclick="closeAssign()">✕</button></div>
+    <div class="alert err" id="assignAlert"></div>
+    <div class="fg"><label>Issue ID</label><input type="number" id="aIssueId" placeholder="Issue ID"/></div>
+    <div class="fg"><label>Sprint ID</label><input type="number" id="aSprintId" placeholder="Sprint ID"/></div>
+    <div class="modal-footer">
+      <button class="mbtn ghost" onclick="closeAssign()">Cancel</button>
+      <button class="mbtn primary" onclick="doAssign()">Assign</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API='http://localhost:9999';
+const token=localStorage.getItem('token');
+if(!token)window.location.href='login.html';
+const headers={'Content-Type':'application/json','Authorization':'Bearer '+token};
+const email=localStorage.getItem('userEmail')||'';
+document.getElementById('sideEmail').textContent=email;
+document.getElementById('sideAvatar').textContent=email?email[0].toUpperCase():'U';
+function logout(){localStorage.clear();window.location.href='login.html';}
+
+let backlogIssues=[];
+let dragSrcIdx=null;
+
+function statusBadge(s){const m={TODO:'todo',IN_PROGRESS:'inprog',DONE:'done',OPEN:'open'};return`<span class="badge ${m[s]||'open'}">${s||'OPEN'}</span>`}
+function priorityBadge(p){const m={LOW:'low',MEDIUM:'medium',HIGH:'high',CRITICAL:'critical'};return`<span class="badge ${m[p]||'medium'}">${p||'—'}</span>`}
+
+async function loadBacklog(){
+  const pid=document.getElementById('projectIdInput').value||1;
+  document.getElementById('backlogList').innerHTML='<div class="empty">Loading...</div>';
+  try{
+    const res=await fetch(`${API}/api/backlog/${pid}`,{headers});
+    if(!res.ok)throw new Error('Failed');
+    backlogIssues=await res.json();
+    document.getElementById('backlogCount').textContent=`${backlogIssues.length} issue${backlogIssues.length!==1?'s':''}`;
+    renderBacklog();
+  }catch(e){
+    document.getElementById('backlogList').innerHTML='<div class="empty">Could not load backlog</div>';
+  }
+}
+
+function renderBacklog(){
+  if(!backlogIssues.length){document.getElementById('backlogList').innerHTML='<div class="empty">No backlog issues</div>';return;}
+  document.getElementById('backlogList').innerHTML=backlogIssues.map((i,idx)=>`
+    <div class="issue-row" draggable="true" data-idx="${idx}"
+      ondragstart="dragStart(event,${idx})" ondragover="dragOver(event,${idx})" ondrop="drop(event,${idx})" ondragend="dragEnd()">
+      <span class="drag-handle">⠿</span>
+      <span class="issue-key">${i.issueKey||'—'}</span>
+      <span class="issue-title">${i.issueTitle||'Untitled'}</span>
+      ${statusBadge(i.issueStatus)}
+      ${priorityBadge(i.priority)}
+      <button class="assign-btn" onclick="quickAssign('${i.issueKey}',${i.sprintId||''})">→ Sprint</button>
+    </div>`).join('');
+}
+
+function dragStart(e,idx){dragSrcIdx=idx;e.target.classList.add('dragging');}
+function dragOver(e,idx){e.preventDefault();document.querySelectorAll('.issue-row').forEach(r=>r.classList.remove('drag-over'));if(idx!==dragSrcIdx)e.currentTarget.classList.add('drag-over');}
+function dragEnd(){document.querySelectorAll('.issue-row').forEach(r=>{r.classList.remove('dragging');r.classList.remove('drag-over');});}
+
+async function drop(e,targetIdx){
+  e.preventDefault();
+  if(dragSrcIdx===null||dragSrcIdx===targetIdx)return;
+  const moved=backlogIssues.splice(dragSrcIdx,1)[0];
+  backlogIssues.splice(targetIdx,0,moved);
+  dragSrcIdx=null;
+  renderBacklog();
+  const pid=document.getElementById('projectIdInput').value||1;
+  const orderedIds=backlogIssues.map(i=>i.id||i.issueKey);
+  try{await fetch(`${API}/api/backlog/${pid}/reorder`,{method:'POST',headers,body:JSON.stringify(orderedIds)});}catch(e){}
+}
+
+function quickAssign(key,currentSprint){
+  document.getElementById('aIssueId').value=key;
+  document.getElementById('assignOverlay').classList.add('show');
+}
+
+function openAssign(){document.getElementById('assignOverlay').classList.add('show');}
+function closeAssign(){document.getElementById('assignOverlay').classList.remove('show');}
+
+async function doAssign(){
+  const issueId=document.getElementById('aIssueId').value;
+  const sprintId=document.getElementById('aSprintId').value;
+  if(!issueId||!sprintId){showAlert('Fill all fields');return;}
+  try{
+    const res=await fetch(`${API}/api/backlog/add-to-sprint/${issueId}/${sprintId}`,{method:'PUT',headers});
+    if(!res.ok)throw new Error('Failed');
+    closeAssign();
+    loadBacklog();
+  }catch(e){showAlert('Could not assign to sprint');}
+}
+
+function showAlert(m){const el=document.getElementById('assignAlert');el.textContent=m;el.className='alert err show';}
+
+async function loadHierarchy(){
+  const pid=document.getElementById('projectIdInput').value||1;
+  try{
+    const res=await fetch(`${API}/api/backlog/${pid}/hierarchy`,{headers});
+    if(!res.ok)throw new Error();
+    const data=await res.json();
+    alert('Hierarchy loaded — check console for data');
+    console.log('Hierarchy:', data);
+  }catch(e){alert('Could not load hierarchy');}
+}
+</script>
+</body>
+</html>

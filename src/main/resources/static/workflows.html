@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TaskFlow — Workflows</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0b0f;--surface:#111318;--card:#161a22;--card2:#1c2130;--border:#1e2330;--accent:#4f7cff;--accent2:#7c5cfc;--success:#22c55e;--warning:#f59e0b;--danger:#ef4444;--text:#e8eaf0;--muted:#6b7280}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 0;position:fixed;top:0;left:0;bottom:0;z-index:50}
+.sl{display:flex;align-items:center;gap:9px;padding:0 16px 20px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.li{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.lt{font-size:17px;font-weight:700}.lt span{color:var(--accent)}
+.ns{padding:0 10px;margin-top:8px}
+.nl{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:0 8px;margin:12px 0 4px}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:500;transition:all .15s;cursor:pointer;position:relative}
+.ni:hover{background:var(--card);color:var(--text)}
+.ni.active{background:rgba(79,124,255,.1);color:var(--accent)}
+.ni.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--accent);border-radius:2px}
+.nico{font-size:15px;width:18px;text-align:center}
+.sf{margin-top:auto;padding:12px 10px 0;border-top:1px solid var(--border)}
+.uc{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px}
+.av{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.un{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.logout-btn{width:100%;margin-top:6px;padding:9px;background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;text-align:left;display:flex;align-items:center;gap:8px}
+.logout-btn:hover{border-color:var(--danger);color:var(--danger)}
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+.page-title{font-size:18px;font-weight:700}
+.tb-right{display:flex;align-items:center;gap:10px}
+.tb-btn{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 14px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.tb-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tb-btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;font-weight:600}
+.content{padding:28px;flex:1}
+.wf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px}
+.wf-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s}
+.wf-head{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.wf-name{font-size:15px;font-weight:700}
+.wf-id{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+.wf-body{padding:14px 18px}
+.wf-desc{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5}
+.trans-list{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+.trans-item{display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:12px}
+.trans-from{color:#9ca3af;font-weight:500}
+.trans-arrow{color:var(--accent);font-size:14px}
+.trans-to{color:var(--text);font-weight:600}
+.trans-roles{margin-left:auto;font-size:10px;color:var(--muted)}
+.wf-actions{display:flex;gap:8px}
+.wf-btn{padding:7px 14px;border-radius:7px;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .2s}
+.wf-btn:hover{border-color:var(--accent);color:var(--accent)}
+.empty{text-align:center;padding:60px;color:var(--muted);font-size:13px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;z-index:200;padding:40px 20px;overflow-y:auto}
+.overlay.show{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:560px;position:relative;animation:min .25s ease;margin:auto}
+@keyframes min{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:17px;font-weight:700}
+.mx{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px}.mx:hover{color:var(--text)}
+.fg{margin-bottom:14px}
+label{display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:6px;text-transform:uppercase;letter-spacing:.7px}
+input,select,textarea{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:10px 13px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+select option{background:var(--card2)}
+textarea{resize:vertical;min-height:70px}
+.mbtn{padding:10px 20px;border-radius:9px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.mbtn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff}
+.mbtn.ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.mbtn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.mbtn.sm{padding:7px 14px;font-size:13px}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+.trans-builder{border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+.trans-row{display:grid;grid-template-columns:1fr auto 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px}
+.alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none}
+.alert.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171}
+.alert.show{display:block}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:13px;z-index:999;display:none}
+.toast.show{display:block}
+.toast.ok{border-color:var(--success);color:#4ade80}
+.toast.err2{border-color:var(--danger);color:#f87171}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sl"><div class="li">⚡</div><div class="lt">Task<span>Flow</span></div></div>
+  <div class="ns">
+    <div class="nl">Main</div>
+    <a class="ni" href="dashboard.html"><span class="nico">⊞</span>Dashboard</a>
+    <a class="ni" href="issues.html"><span class="nico">📋</span>Issues</a>
+    <a class="ni" href="board.html"><span class="nico">🗂</span>Board</a>
+    <a class="ni" href="backlog.html"><span class="nico">📌</span>Backlog</a>
+    <div class="nl">Planning</div>
+    <a class="ni" href="sprints.html"><span class="nico">🏃</span>Sprints</a>
+    <a class="ni" href="reports.html"><span class="nico">📊</span>Reports</a>
+    <div class="nl">Settings</div>
+    <a class="ni active" href="workflows.html"><span class="nico">🔄</span>Workflows</a>
+    <a class="ni" href="profile.html"><span class="nico">👤</span>Profile</a>
+  </div>
+  <div class="sf">
+    <div class="uc"><div class="av" id="sideAvatar">U</div><div><div class="un" id="sideEmail">—</div></div></div>
+    <button class="logout-btn" onclick="logout()">🚪 Sign Out</button>
+  </div>
+</nav>
+<div class="main">
+  <div class="topbar">
+    <div class="page-title">Workflows</div>
+    <div class="tb-right">
+      <button class="tb-btn primary" onclick="openCreate()">+ New Workflow</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="wf-grid" id="wfGrid"><div class="empty">Loading workflows...</div></div>
+  </div>
+</div>
+<div class="overlay" id="createOverlay">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Create Workflow</div><button class="mx" onclick="closeCreate()">✕</button></div>
+    <div class="alert err" id="createAlert"></div>
+    <div class="fg"><label>Workflow Name *</label><input type="text" id="wfName" placeholder="e.g. Default Workflow"/></div>
+    <div class="fg"><label>Description</label><textarea id="wfDesc" placeholder="Describe this workflow..."></textarea></div>
+    <div class="fg">
+      <label>Transitions</label>
+      <div class="trans-builder" id="transBuilder">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Add status transitions below:</div>
+        <div id="transRows"></div>
+        <button class="mbtn ghost sm" onclick="addTransRow()" style="margin-top:8px;width:100%">+ Add Transition</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="mbtn ghost" onclick="closeCreate()">Cancel</button>
+      <button class="mbtn primary" onclick="doCreate()">Create Workflow</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const API='http://localhost:9999';
+const token=localStorage.getItem('token');
+if(!token)window.location.href='login.html';
+const headers={'Content-Type':'application/json','Authorization':'Bearer '+token};
+const email=localStorage.getItem('userEmail')||'';
+document.getElementById('sideEmail').textContent=email;
+document.getElementById('sideAvatar').textContent=email?email[0].toUpperCase():'U';
+function logout(){localStorage.clear();window.location.href='login.html';}
+
+const STATUSES=['OPEN','TODO','IN_PROGRESS','IN_REVIEW','DONE','BLOCKED','CLOSED','REOPENED','DEPLOYMENT'];
+const ROLES=['ADMIN','MANAGER','DEVELOPER','TESTER'];
+
+function showToast(msg,type='ok'){
+  const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+type;
+  setTimeout(()=>t.className='toast',2500);
+}
+
+async function loadWorkflows(){
+  try{
+    const res=await fetch(`${API}/api/workflows/all`,{headers});
+    if(!res.ok)throw new Error();
+    const wfs=await res.json();
+    if(!wfs.length){document.getElementById('wfGrid').innerHTML='<div class="empty">No workflows yet. Create one to get started.</div>';return;}
+    document.getElementById('wfGrid').innerHTML=wfs.map(w=>wfCard(w)).join('');
+  }catch(e){document.getElementById('wfGrid').innerHTML='<div class="empty">Could not load workflows</div>';}
+}
+
+function wfCard(w){
+  const trans=(w.transaction||[]).slice(0,4);
+  const transHTML=trans.length?trans.map(t=>`
+    <div class="trans-item">
+      <span class="trans-from">${t.fromStats||'?'}</span>
+      <span class="trans-arrow">→</span>
+      <span class="trans-to">${t.toStatus||'?'}</span>
+      <span class="trans-roles">${(t.allowedRole||[]).join(', ')||'All'}</span>
+    </div>`).join(''):'<div style="color:var(--muted);font-size:12px">No transitions defined</div>';
+  const more=w.transaction&&w.transaction.length>4?`<div style="font-size:11px;color:var(--muted);margin-top:6px">+${w.transaction.length-4} more transitions</div>`:'';
+  return`<div class="wf-card">
+    <div class="wf-head">
+      <div><div class="wf-name">${w.name||'Workflow'}</div><div class="wf-id">ID: ${w.id}</div></div>
+    </div>
+    <div class="wf-body">
+      <div class="wf-desc">${w.workDescription||'No description'}</div>
+      <div class="trans-list">${transHTML}${more}</div>
+      <div class="wf-actions">
+        <button class="wf-btn" onclick="checkTransition(${w.id})">✓ Check Transition</button>
+        <button class="wf-btn" onclick="deleteWf(${w.id})" style="border-color:rgba(239,68,68,.3);color:#f87171">🗑 Delete</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function checkTransition(wfId){
+  const from=prompt('From status (e.g. TODO):');
+  if(!from)return;
+  const to=prompt('To status (e.g. IN_PROGRESS):');
+  if(!to)return;
+  const role=prompt('Your role (ADMIN/MANAGER/DEVELOPER/TESTER):');
+  if(!role)return;
+  fetch(`${API}/api/workflows/${wfId}/transactions?from=${from}&to=${to}&userRole=${role}`,{headers})
+    .then(r=>r.json()).then(d=>alert(d?'✅ Transition ALLOWED':'❌ Transition NOT ALLOWED'))
+    .catch(()=>alert('Could not check transition'));
+}
+
+async function deleteWf(id){
+  if(!confirm('Delete this workflow?'))return;
+  try{
+    const res=await fetch(`${API}/api/workflows/${id}`,{method:'DELETE',headers});
+    if(!res.ok)throw new Error('Status: '+res.status);
+    showToast('Workflow deleted','ok');
+    loadWorkflows();
+  }catch(e){showToast('Could not delete','err2');}
+}
+
+let transCount=0;
+function addTransRow(){
+  transCount++;
+  const id=transCount;
+  const statusOpts=STATUSES.map(s=>`<option value="${s}">${s}</option>`).join('');
+  const roleOpts=ROLES.map(r=>`<option value="${r}">${r}</option>`).join('');
+  const row=document.createElement('div');
+  row.className='trans-row';row.id='tr-'+id;
+  row.innerHTML=`
+    <div class="fg" style="margin:0"><label style="font-size:10px">From</label><select id="tf-${id}">${statusOpts}</select></div>
+    <div style="padding-top:22px;color:var(--accent);font-size:18px">→</div>
+    <div class="fg" style="margin:0"><label style="font-size:10px">To</label><select id="tt-${id}">${statusOpts}</select></div>
+    <div class="fg" style="margin:0"><label style="font-size:10px">Role</label><select id="tr2-${id}">${roleOpts}</select></div>
+    <button onclick="document.getElementById('tr-${id}').remove()" style="background:transparent;border:none;color:var(--danger);cursor:pointer;padding:0 4px;margin-top:18px;font-size:16px">✕</button>`;
+  document.getElementById('transRows').appendChild(row);
+}
+
+function openCreate(){transCount=0;document.getElementById('transRows').innerHTML='';addTransRow();document.getElementById('createOverlay').classList.add('show');}
+function closeCreate(){document.getElementById('createOverlay').classList.remove('show');}
+
+async function doCreate(){
+  const name=document.getElementById('wfName').value.trim();
+  if(!name){showCAlert('Workflow name is required');return;}
+  const rows=document.querySelectorAll('[id^="tr-"]');
+  const transactions=[];
+  rows.forEach(r=>{
+    const id=r.id.replace('tr-','');
+    const from=document.getElementById('tf-'+id)?.value;
+    const to=document.getElementById('tt-'+id)?.value;
+    const role=document.getElementById('tr2-'+id)?.value;
+    if(from&&to)transactions.push({fromStats:from,toStatus:to,allowedRole:role?[role]:[]});
+  });
+  try{
+    const res=await fetch(`${API}/api/workflows/create`,{method:'POST',headers,body:JSON.stringify({
+      name,workDescription:document.getElementById('wfDesc').value,transaction:transactions
+    })});
+    if(!res.ok)throw new Error();
+    closeCreate();showToast('Workflow created!','ok');loadWorkflows();
+  }catch(e){showCAlert('Could not create workflow');}
+}
+
+function showCAlert(m){const el=document.getElementById('createAlert');el.textContent=m;el.className='alert err show';}
+
+loadWorkflows();
+</script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+# Maven / Build
+target/
+build/
+*.class
+*.jar
+*.war
+
+# Logs
+*.log
+
+# Eclipse
+.metadata/
+.classpath
+.project
+.settings/
+.factorypath
+.apt_generated
+.springBeans
+.sts4-cache
+
+# IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VS Code
+.vscode/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Environment / Secrets
+.env
+application.properties
+
+
+# Node
+node_modules/

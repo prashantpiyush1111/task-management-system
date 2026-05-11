@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TaskFlow — Profile</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0b0f;--surface:#111318;--card:#161a22;--card2:#1c2130;--border:#1e2330;--accent:#4f7cff;--accent2:#7c5cfc;--success:#22c55e;--warning:#f59e0b;--danger:#ef4444;--text:#e8eaf0;--muted:#6b7280}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 0;position:fixed;top:0;left:0;bottom:0;z-index:50}
+.sl{display:flex;align-items:center;gap:9px;padding:0 16px 20px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.li{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.lt{font-size:17px;font-weight:700}.lt span{color:var(--accent)}
+.ns{padding:0 10px;margin-top:8px}
+.nl{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:0 8px;margin:12px 0 4px}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:500;transition:all .15s;cursor:pointer;position:relative}
+.ni:hover{background:var(--card);color:var(--text)}
+.ni.active{background:rgba(79,124,255,.1);color:var(--accent)}
+.ni.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--accent);border-radius:2px}
+.nico{font-size:15px;width:18px;text-align:center}
+.sf{margin-top:auto;padding:12px 10px 0;border-top:1px solid var(--border)}
+.uc{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;overflow:hidden}
+.av{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.un{font-size:11px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px}
+.logout-btn{width:100%;margin-top:6px;padding:9px;background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;text-align:left;display:flex;align-items:center;gap:8px}
+.logout-btn:hover{border-color:var(--danger);color:var(--danger)}
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;position:sticky;top:0;z-index:40}
+.page-title{font-size:18px;font-weight:700}
+.content{padding:28px;flex:1;max-width:800px}
+.profile-hero{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:24px;display:flex;align-items:center;gap:24px;position:relative;overflow:hidden}
+.profile-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.big-av{width:72px;height:72px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;flex-shrink:0;border:3px solid var(--border)}
+.profile-info h2{font-size:22px;font-weight:700;margin-bottom:4px}
+.profile-info .p-email{color:var(--muted);font-size:14px;margin-bottom:8px}
+.profile-info .p-role{display:inline-flex;padding:3px 12px;background:rgba(79,124,255,.12);color:var(--accent);border-radius:20px;font-size:12px;font-weight:600}
+.status-dot{width:8px;height:8px;background:var(--success);border-radius:50%;display:inline-block;margin-right:6px;box-shadow:0 0 6px var(--success)}
+.section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px}
+.section-head{font-size:15px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.fg{margin-bottom:16px}
+label{display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:7px;text-transform:uppercase;letter-spacing:.7px}
+input,select{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:11px 13px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,124,255,.1)}
+input:disabled{opacity:.5;cursor:not-allowed}
+select option{background:var(--card2)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.btn{padding:11px 24px;border-radius:9px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff}
+.btn.primary:hover{opacity:.88}
+.btn.danger{background:transparent;border:1px solid var(--danger);color:var(--danger)}
+.btn.danger:hover{background:rgba(239,68,68,.08)}
+.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-label{font-size:14px;font-weight:500}
+.toggle-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;inset:0;background:var(--border);border-radius:12px;transition:.3s}
+.toggle-slider:before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+input:checked+.toggle-slider{background:var(--accent)}
+input:checked+.toggle-slider:before{transform:translateX(20px)}
+.alert{padding:11px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none}
+.alert.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171}
+.alert.ok{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#4ade80}
+.alert.show{display:block}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:13px;z-index:999;display:none}
+.toast.show{display:block}
+.toast.ok{border-color:var(--success);color:#4ade80}
+.toast.err2{border-color:var(--danger);color:#f87171}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sl"><div class="li">⚡</div><div class="lt">Task<span>Flow</span></div></div>
+  <div class="ns">
+    <div class="nl">Main</div>
+    <a class="ni" href="dashboard.html"><span class="nico">⊞</span>Dashboard</a>
+    <a class="ni" href="issues.html"><span class="nico">📋</span>Issues</a>
+    <a class="ni" href="board.html"><span class="nico">🗂</span>Board</a>
+    <a class="ni" href="backlog.html"><span class="nico">📌</span>Backlog</a>
+    <div class="nl">Planning</div>
+    <a class="ni" href="sprints.html"><span class="nico">🏃</span>Sprints</a>
+    <a class="ni" href="reports.html"><span class="nico">📊</span>Reports</a>
+    <div class="nl">Settings</div>
+    <a class="ni" href="workflows.html"><span class="nico">🔄</span>Workflows</a>
+    <a class="ni active" href="profile.html"><span class="nico">👤</span>Profile</a>
+  </div>
+  <div class="sf">
+    <div class="uc">
+      <div class="av" id="sideAvatar">U</div>
+      <div style="min-width:0;flex:1">
+        <div class="un" id="sideEmail">—</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="logout()">🚪 Sign Out</button>
+  </div>
+</nav>
+<div class="main">
+  <div class="topbar"><div class="page-title">Profile & Settings</div></div>
+  <div class="content">
+    <div class="profile-hero">
+      <div class="big-av" id="bigAvatar">U</div>
+      <div class="profile-info">
+        <h2 id="heroName">Loading...</h2>
+        <div class="p-email" id="heroEmail">—</div>
+        <div><span class="status-dot"></span><span class="p-role" id="heroRole">—</span></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-head">👤 Profile Information</div>
+      <div class="alert err" id="profileAlert"></div>
+      <div class="frow">
+        <div class="fg"><label>Email (readonly)</label><input type="email" id="profEmail" disabled/></div>
+        <div class="fg"><label>Department</label><input type="text" id="profDept" placeholder="e.g. Engineering"/></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Designation</label><input type="text" id="profDesig" placeholder="e.g. Senior Developer"/></div>
+        <div class="fg"><label>Organization</label><input type="text" id="profOrg" placeholder="e.g. Acme Corp"/></div>
+      </div>
+      <div class="fg">
+        <label>Account Status</label>
+        <div class="toggle-row" style="border:none;padding:0">
+          <div><div class="toggle-label">Active Account</div><div class="toggle-desc">Your account is currently active</div></div>
+          <label class="toggle"><input type="checkbox" id="profActive" checked/><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn ghost" onclick="loadProfile()">↺ Reset</button>
+        <button class="btn primary" onclick="saveProfile()">Save Changes</button>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-head">🔒 Change Password</div>
+      <div class="alert err" id="pwAlert"></div>
+      <div class="fg"><label>New Password</label><input type="password" id="newPw" placeholder="Min 8 characters"/></div>
+      <div class="fg"><label>Confirm Password</label><input type="password" id="confirmPw" placeholder="Repeat new password"/></div>
+      <div class="btn-row"><button class="btn primary" onclick="changePassword()">Update Password</button></div>
+    </div>
+    <div class="section" style="border-color:rgba(239,68,68,.25)">
+      <div class="section-head" style="color:var(--danger)">⚠️ Danger Zone</div>
+      <div class="toggle-row">
+        <div><div class="toggle-label">Sign out of all devices</div><div class="toggle-desc">Revokes all active sessions</div></div>
+        <button class="btn danger" onclick="logout()" style="padding:8px 16px;font-size:13px">Sign Out</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const API='http://localhost:9999';
+const token=localStorage.getItem('token');
+if(!token)window.location.href='login.html';
+const headers={'Content-Type':'application/json','Authorization':'Bearer '+token};
+const email=localStorage.getItem('userEmail')||'';
+document.getElementById('sideEmail').textContent=email;
+document.getElementById('sideAvatar').textContent=email?email[0].toUpperCase():'U';
+document.getElementById('bigAvatar').textContent=email?email[0].toUpperCase():'U';
+document.getElementById('heroEmail').textContent=email;
+document.getElementById('heroName').textContent=email.split('@')[0]||'User';
+document.getElementById('profEmail').value=email;
+function logout(){localStorage.clear();window.location.href='login.html';}
+function showToast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+type;setTimeout(()=>t.className='toast',2500);}
+async function loadProfile(){
+  if(!email)return;
+  try{
+    const res=await fetch(`${API}/api/user_profile-update/${encodeURIComponent(email)}`,{headers});
+    if(!res.ok)return;
+    const d=await res.json();
+    document.getElementById('profDept').value=d.department||'';
+    document.getElementById('profDesig').value=d.designation||'';
+    document.getElementById('profOrg').value=d.organizationName||'';
+    document.getElementById('profActive').checked=d.active!==false;
+    if(d.designation)document.getElementById('heroRole').textContent=d.designation;
+  }catch(e){}
+}
+async function saveProfile(){
+  const dept=document.getElementById('profDept').value.trim();
+  const desig=document.getElementById('profDesig').value.trim();
+  const org=document.getElementById('profOrg').value.trim();
+  const active=document.getElementById('profActive').checked;
+  try{
+    const res=await fetch(`${API}/api/user_profile-update/update/${encodeURIComponent(email)}`,{
+      method:'PUT',headers,
+      body:JSON.stringify({userOfficialEmail:email,department:dept,designation:desig,organizationName:org,active})
+    });
+    if(!res.ok)throw new Error();
+    showToast('Profile updated!','ok');
+    if(desig)document.getElementById('heroRole').textContent=desig;
+  }catch(e){
+    const el=document.getElementById('profileAlert');el.textContent='Could not save profile';el.className='alert err show';
+  }
+}
+async function changePassword(){
+  const pw=document.getElementById('newPw').value;
+  const cpw=document.getElementById('confirmPw').value;
+  if(!pw||pw.length<8){showPwAlert('Password must be at least 8 characters');return;}
+  if(pw!==cpw){showPwAlert('Passwords do not match');return;}
+  try{
+    const res=await fetch(`${API}/api/user-auth/reset-password`,{
+      method:'POST',headers,
+      body:JSON.stringify({userOfficialEmail:email,newPassword:pw})
+    });
+    if(!res.ok)throw new Error();
+    document.getElementById('newPw').value='';
+    document.getElementById('confirmPw').value='';
+    showToast('Password updated!','ok');
+  }catch(e){showPwAlert('Could not update password');}
+}
+function showPwAlert(m){const el=document.getElementById('pwAlert');el.textContent=m;el.className='alert err show';}
+loadProfile();
+</script>
+</body>
+</html>

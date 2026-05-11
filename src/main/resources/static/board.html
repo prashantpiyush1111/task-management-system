@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TaskFlow — Board</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0b0f;--surface:#111318;--card:#161a22;--card2:#1c2130;--border:#1e2330;--accent:#4f7cff;--accent2:#7c5cfc;--success:#22c55e;--warning:#f59e0b;--danger:#ef4444;--text:#e8eaf0;--muted:#6b7280}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 0;position:fixed;top:0;left:0;bottom:0;z-index:50}
+.sl{display:flex;align-items:center;gap:9px;padding:0 16px 20px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.li{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.lt{font-size:17px;font-weight:700}.lt span{color:var(--accent)}
+.ns{padding:0 10px;margin-top:8px}
+.nl{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:0 8px;margin:12px 0 4px}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:500;transition:all .15s;cursor:pointer;position:relative}
+.ni:hover{background:var(--card);color:var(--text)}
+.ni.active{background:rgba(79,124,255,.1);color:var(--accent)}
+.ni.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--accent);border-radius:2px}
+.nico{font-size:15px;width:18px;text-align:center}
+.sf{margin-top:auto;padding:12px 10px 0;border-top:1px solid var(--border)}
+.uc{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;overflow:hidden}
+.av{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.un{font-size:11px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px}
+.logout-btn{width:100%;margin-top:6px;padding:9px;background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;text-align:left;display:flex;align-items:center;gap:8px}
+.logout-btn:hover{border-color:var(--danger);color:var(--danger)}
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;flex-shrink:0}
+.page-title{font-size:18px;font-weight:700;letter-spacing:-.3px}
+.tb-right{display:flex;align-items:center;gap:10px}
+.tb-btn{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 14px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.tb-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tb-btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;font-weight:600}
+.board-area{padding:20px 24px;overflow-x:auto;flex:1;display:flex;flex-direction:column}
+.board-top{display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-shrink:0}
+.board-id-input{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;width:180px}
+.board-id-input:focus{border-color:var(--accent)}
+.columns-container{display:flex;gap:16px;min-height:600px;flex:1}
+.column{background:var(--card);border:1px solid var(--border);border-radius:12px;width:280px;flex-shrink:0;display:flex;flex-direction:column;max-height:calc(100vh - 200px)}
+.col-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.col-name{font-size:13px;font-weight:700;letter-spacing:-.2px}
+.col-count{background:var(--card2);color:var(--muted);font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;font-family:'JetBrains Mono',monospace}
+.col-wip{font-size:11px;color:var(--warning)}
+.cards-list{padding:12px;overflow-y:auto;flex:1;min-height:100px}
+.issue-card{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:13px;margin-bottom:9px;cursor:pointer;transition:all .2s;user-select:none}
+.issue-card:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 4px 16px rgba(79,124,255,.12)}
+.issue-card.dragging{opacity:.5;border-style:dashed}
+.issue-card.drag-over{border-color:var(--accent);background:rgba(79,124,255,.06)}
+.card-key{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);margin-bottom:6px}
+.card-title{font-size:13px;font-weight:500;line-height:1.4;margin-bottom:10px}
+.card-footer{display:flex;align-items:center;justify-content:space-between}
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase}
+.badge.high{background:rgba(239,68,68,.12);color:#f87171}
+.badge.medium{background:rgba(245,158,11,.12);color:#fbbf24}
+.badge.low{background:rgba(34,197,94,.12);color:#4ade80}
+.badge.critical{background:rgba(124,92,252,.15);color:#c4b5fd}
+.card-assignee{font-size:11px;color:var(--muted);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.add-card-btn{width:100%;padding:9px;background:transparent;border:1px dashed var(--border);border-radius:8px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;margin-top:4px;flex-shrink:0}
+.add-card-btn:hover{border-color:var(--accent);color:var(--accent)}
+.empty-col{text-align:center;padding:30px;color:var(--muted);font-size:13px}
+.board-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;color:var(--muted)}
+.board-placeholder-icon{font-size:48px;margin-bottom:16px;opacity:.5}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;z-index:200;padding:40px 20px}
+.overlay.show{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:480px;position:relative;animation:min .25s ease}
+@keyframes min{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:17px;font-weight:700}
+.mx{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px}.mx:hover{color:var(--text)}
+.fg{margin-bottom:14px}
+label{display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:6px;text-transform:uppercase;letter-spacing:.7px}
+input,select{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:10px 13px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
+input:focus,select:focus{border-color:var(--accent)}
+select option{background:var(--card2)}
+.mbtn{padding:10px 20px;border-radius:9px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.mbtn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff}
+.mbtn.ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.mbtn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sl"><div class="li">⚡</div><div class="lt">Task<span>Flow</span></div></div>
+  <div class="ns">
+    <div class="nl">Main</div>
+    <a class="ni" href="dashboard.html"><span class="nico">⊞</span>Dashboard</a>
+    <a class="ni" href="issues.html"><span class="nico">📋</span>Issues</a>
+    <a class="ni active" href="board.html"><span class="nico">🗂</span>Board</a>
+    <a class="ni" href="backlog.html"><span class="nico">📌</span>Backlog</a>
+    <div class="nl">Planning</div>
+    <a class="ni" href="sprints.html"><span class="nico">🏃</span>Sprints</a>
+    <a class="ni" href="reports.html"><span class="nico">📊</span>Reports</a>
+    <div class="nl">Settings</div>
+    <a class="ni" href="workflows.html"><span class="nico">🔄</span>Workflows</a>
+    <a class="ni" href="profile.html"><span class="nico">👤</span>Profile</a>
+  </div>
+  <div class="sf">
+    <div class="uc"><div class="av" id="sideAvatar">U</div><div><div class="un" id="sideEmail">—</div></div></div>
+    <button class="logout-btn" onclick="logout()">🚪 Sign Out</button>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <div class="page-title">Kanban Board</div>
+    <div class="tb-right">
+      <button class="tb-btn" onclick="openAddCol()">+ Add Column</button>
+      <button class="tb-btn primary" onclick="openAddCard()">+ Add Card</button>
+    </div>
+  </div>
+  <div class="board-area">
+    <div class="board-top">
+      <label style="color:var(--muted);font-size:13px;margin:0">Board ID:</label>
+      <input class="board-id-input" id="boardIdInput" type="number" placeholder="Enter Board ID" value="1"/>
+      <button class="tb-btn" onclick="loadBoard()">Load Board</button>
+    </div>
+    <div class="columns-container" id="columnsContainer">
+      <div class="board-placeholder">
+        <div class="board-placeholder-icon">🗂</div>
+        <div>Enter a Board ID and click Load Board</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="addColOverlay">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Add Column</div><button class="mx" onclick="closeModal('addColOverlay')">✕</button></div>
+    <div class="fg"><label>Column Name</label><input type="text" id="colName" placeholder="e.g. In Review"/></div>
+    <div class="fg"><label>WIP Limit (0 = unlimited)</label><input type="number" id="colWip" value="0" min="0"/></div>
+    <div class="fg"><label>Status Key</label>
+      <select id="colStatus">
+        <option value="OPEN">OPEN</option><option value="TODO">TODO</option>
+        <option value="IN_PROGRESS">IN_PROGRESS</option><option value="IN_REVIEW">IN_REVIEW</option>
+        <option value="DONE">DONE</option><option value="BLOCKED">BLOCKED</option>
+      </select>
+    </div>
+    <div class="modal-footer"><button class="mbtn ghost" onclick="closeModal('addColOverlay')">Cancel</button><button class="mbtn primary" onclick="doAddColumn()">Add</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="addCardOverlay">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Add Card to Board</div><button class="mx" onclick="closeModal('addCardOverlay')">✕</button></div>
+    <div class="fg"><label>Issue ID</label><input type="number" id="cardIssueId" placeholder="Issue ID"/></div>
+    <div class="fg"><label>Column ID</label><input type="number" id="cardColId" placeholder="Column ID"/></div>
+    <div class="modal-footer"><button class="mbtn ghost" onclick="closeModal('addCardOverlay')">Cancel</button><button class="mbtn primary" onclick="doAddCard()">Add Card</button></div>
+  </div>
+</div>
+
+<script>
+const API='http://localhost:9999';
+const token=localStorage.getItem('token');
+if(!token)window.location.href='login.html';
+const headers={'Content-Type':'application/json','Authorization':'Bearer '+token};
+const email=localStorage.getItem('userEmail')||'';
+document.getElementById('sideEmail').textContent=email;
+document.getElementById('sideAvatar').textContent=email?email[0].toUpperCase():'U';
+function logout(){localStorage.clear();window.location.href='login.html';}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+function openAddCol(){document.getElementById('addColOverlay').classList.add('show');}
+function openAddCard(){document.getElementById('addCardOverlay').classList.add('show');}
+
+let boardId=1, columnsData=[];
+let dragCard=null, dragFromCol=null;
+
+function priorityBadge(p){const m={LOW:'low',MEDIUM:'medium',HIGH:'high',CRITICAL:'critical'};return`<span class="badge ${m[p]||'medium'}">${p||'—'}</span>`}
+
+async function loadBoard(){
+  boardId=parseInt(document.getElementById('boardIdInput').value)||1;
+  const cont=document.getElementById('columnsContainer');
+  cont.innerHTML='<div class="board-placeholder"><div class="board-placeholder-icon">⏳</div><div>Loading board...</div></div>';
+  try{
+    const res=await fetch(`${API}/api/boards/${boardId}/columns`,{headers});
+    if(!res.ok)throw new Error('Board not found');
+    columnsData=await res.json();
+    if(!columnsData.length){cont.innerHTML='<div class="board-placeholder"><div class="board-placeholder-icon">🗂</div><div>No columns yet. Add a column to start.</div></div>';return;}
+    cont.innerHTML='';
+    for(const col of columnsData){
+      const cardsRes=await fetch(`${API}/api/boards/${boardId}/cards/${col.id}`,{headers});
+      const cards=cardsRes.ok?await cardsRes.json():[];
+      cont.appendChild(buildColumn(col,cards));
+    }
+  }catch(e){cont.innerHTML=`<div class="board-placeholder"><div class="board-placeholder-icon">⚠️</div><div>${e.message}</div></div>`;}
+}
+
+function buildColumn(col,cards){
+  const div=document.createElement('div');
+  div.className='column';
+  div.dataset.colId=col.id;
+  const wipStr=col.wipLimit&&col.wipLimit>0?`<span class="col-wip">WIP: ${col.wipLimit}</span>`:'';
+  div.innerHTML=`
+    <div class="col-header">
+      <div class="col-name">${col.name||'Column'}</div>
+      <div style="display:flex;align-items:center;gap:8px">${wipStr}<span class="col-count">${cards.length}</span></div>
+    </div>
+    <div class="cards-list" id="cards-${col.id}" ondragover="allowDrop(event)" ondrop="dropCard(event,${col.id})">
+      ${cards.length?cards.map(c=>cardHTML(c)).join(''):'<div class="empty-col">No cards</div>'}
+    </div>
+    <button class="add-card-btn" onclick="openAddCard()">+ Add Card</button>`;
+  return div;
+}
+
+function cardHTML(c){
+  return`<div class="issue-card" draggable="true" data-card-id="${c.id}" data-issue-id="${c.issueId}"
+    ondragstart="dragStart(event,${c.id})" ondragend="dragEnd(event)">
+    <div class="card-key">ISSUE-${c.issueId||c.id}</div>
+    <div class="card-title">Issue #${c.issueId||'—'}</div>
+    <div class="card-footer">
+      <span style="font-size:11px;color:var(--muted)">Pos: ${c.position||0}</span>
+    </div>
+  </div>`;
+}
+
+function dragStart(e,cardId){dragCard=cardId;e.target.classList.add('dragging');}
+function dragEnd(e){e.target.classList.remove('dragging');}
+function allowDrop(e){e.preventDefault();}
+async function dropCard(e,colId){
+  e.preventDefault();
+  if(!dragCard)return;
+  try{
+    await fetch(`${API}/api/boards/${boardId}/card/${dragCard}/move`,{method:'PUT',headers,body:JSON.stringify({columnId:colId,position:0})});
+    loadBoard();
+  }catch(err){loadBoard();}
+  dragCard=null;
+}
+
+async function doAddColumn(){
+  try{
+    const res=await fetch(`${API}/api/boards/${boardId}/column`,{method:'POST',headers,body:JSON.stringify({
+      name:document.getElementById('colName').value,
+      wipLimit:parseInt(document.getElementById('colWip').value)||0,
+      statusKey:document.getElementById('colStatus').value,
+      boardId:boardId
+    })});
+    if(!res.ok)throw new Error('Failed');
+    closeModal('addColOverlay');loadBoard();
+  }catch(e){alert('Failed to add column');}
+}
+
+async function doAddCard(){
+  try{
+    const issueId=document.getElementById('cardIssueId').value;
+    const colId=document.getElementById('cardColId').value;
+    const res=await fetch(`${API}/api/boards/${boardId}/card`,{method:'POST',headers,body:JSON.stringify({columnId:parseInt(colId),issueId:parseInt(issueId)})});
+    if(!res.ok)throw new Error('Failed');
+    closeModal('addCardOverlay');loadBoard();
+  }catch(e){alert('Failed to add card');}
+}
+</script>
+</body>
+</html>

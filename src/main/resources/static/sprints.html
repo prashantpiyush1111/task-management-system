@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TaskFlow — Sprints</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0b0f;--surface:#111318;--card:#161a22;--card2:#1c2130;--border:#1e2330;--accent:#4f7cff;--accent2:#7c5cfc;--success:#22c55e;--warning:#f59e0b;--danger:#ef4444;--text:#e8eaf0;--muted:#6b7280}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 0;position:fixed;top:0;left:0;bottom:0;z-index:50}
+.sl{display:flex;align-items:center;gap:9px;padding:0 16px 20px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.li{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.lt{font-size:17px;font-weight:700}.lt span{color:var(--accent)}
+.ns{padding:0 10px;margin-top:8px}
+.nl{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:0 8px;margin:12px 0 4px}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:500;transition:all .15s;cursor:pointer;position:relative}
+.ni:hover{background:var(--card);color:var(--text)}
+.ni.active{background:rgba(79,124,255,.1);color:var(--accent)}
+.ni.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--accent);border-radius:2px}
+.nico{font-size:15px;width:18px;text-align:center}
+.sf{margin-top:auto;padding:12px 10px 0;border-top:1px solid var(--border)}
+.uc{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px}
+.av{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.un{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.logout-btn{width:100%;margin-top:6px;padding:9px;background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;text-align:left;display:flex;align-items:center;gap:8px}
+.logout-btn:hover{border-color:var(--danger);color:var(--danger)}
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+.page-title{font-size:18px;font-weight:700}
+.tb-right{display:flex;align-items:center;gap:10px}
+.tb-btn{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 14px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.tb-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tb-btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;font-weight:600}
+.content{padding:28px;flex:1}
+.top-row{display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.ri{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none}
+.ri:focus{border-color:var(--accent)}
+.rb{padding:8px 16px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
+.sprints-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.sprint-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s}
+.sc-head{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between}
+.sc-name{font-size:15px;font-weight:700;margin-bottom:4px}
+.sc-id{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+.state-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase}
+.state-badge.planned{background:rgba(107,114,128,.15);color:#9ca3af}
+.state-badge.active{background:rgba(34,197,94,.15);color:#4ade80}
+.state-badge.completed{background:rgba(79,124,255,.15);color:#93bbff}
+.sc-body{padding:14px 18px}
+.sc-dates{display:flex;gap:20px;margin-bottom:12px}
+.sc-date{font-size:12px;color:var(--muted)}.sc-date span{color:var(--text);font-weight:500}
+.sc-actions{display:flex;gap:8px;flex-wrap:wrap}
+.sc-btn{padding:7px 14px;border-radius:7px;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .2s}
+.sc-btn:hover{border-color:var(--accent);color:var(--accent)}
+.sc-btn.start{border-color:var(--success);color:var(--success)}
+.sc-btn.start:hover{background:rgba(34,197,94,.1)}
+.sc-btn.end{border-color:var(--danger);color:var(--danger)}
+.sc-btn.end:hover{background:rgba(239,68,68,.1)}
+.empty{text-align:center;padding:60px;color:var(--muted);font-size:13px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;z-index:200;padding:40px 20px}
+.overlay.show{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:460px;position:relative;animation:min .25s ease}
+@keyframes min{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:17px;font-weight:700}
+.mx{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px}.mx:hover{color:var(--text)}
+.fg{margin-bottom:14px}
+label{display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:6px;text-transform:uppercase;letter-spacing:.7px}
+input,select{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:10px 13px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
+input:focus,select:focus{border-color:var(--accent)}
+select option{background:var(--card2)}
+.mbtn{padding:10px 20px;border-radius:9px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.mbtn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff}
+.mbtn.ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.mbtn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+.alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none}
+.alert.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171}
+.alert.show{display:block}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:13px;z-index:999;display:none}
+.toast.show{display:block}
+.toast.ok{border-color:var(--success);color:#4ade80}
+.toast.err{border-color:var(--danger);color:#f87171}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="sl"><div class="li">⚡</div><div class="lt">Task<span>Flow</span></div></div>
+  <div class="ns">
+    <div class="nl">Main</div>
+    <a class="ni" href="dashboard.html"><span class="nico">⊞</span>Dashboard</a>
+    <a class="ni" href="issues.html"><span class="nico">📋</span>Issues</a>
+    <a class="ni" href="board.html"><span class="nico">🗂</span>Board</a>
+    <a class="ni" href="backlog.html"><span class="nico">📌</span>Backlog</a>
+    <div class="nl">Planning</div>
+    <a class="ni active" href="sprints.html"><span class="nico">🏃</span>Sprints</a>
+    <a class="ni" href="reports.html"><span class="nico">📊</span>Reports</a>
+    <div class="nl">Settings</div>
+    <a class="ni" href="workflows.html"><span class="nico">🔄</span>Workflows</a>
+    <a class="ni" href="profile.html"><span class="nico">👤</span>Profile</a>
+  </div>
+  <div class="sf">
+    <div class="uc"><div class="av" id="sideAvatar">U</div><div><div class="un" id="sideEmail">—</div></div></div>
+    <button class="logout-btn" onclick="logout()">🚪 Sign Out</button>
+  </div>
+</nav>
+<div class="main">
+  <div class="topbar">
+    <div class="page-title">Sprints</div>
+    <div class="tb-right">
+      <button class="tb-btn primary" onclick="openCreate()">+ New Sprint</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="top-row">
+      <label style="color:var(--muted);font-size:13px;margin:0">Project ID:</label>
+      <input class="ri" type="number" id="projInput" placeholder="Project ID" value="1" style="width:160px"/>
+      <button class="rb" onclick="loadSprints()">Load Sprints</button>
+      <button class="rb" style="background:var(--card);border:1px solid var(--border);color:var(--text)" onclick="loadAllSprints()">Load All</button>
+    </div>
+    <div class="sprints-grid" id="sprintsGrid">
+      <div class="empty">Enter Project ID and click Load Sprints</div>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="createOverlay">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Create Sprint</div><button class="mx" onclick="closeCreate()">✕</button></div>
+    <div class="alert err" id="createAlert"></div>
+    <div class="fg"><label>Sprint Name</label><input type="text" id="spName" placeholder="e.g. Sprint 1 — Auth Module"/></div>
+    <div class="fg"><label>Project ID</label><input type="number" id="spProjId" placeholder="Project ID"/></div>
+    <div class="fg"><label>Start Date</label><input type="date" id="spStart"/></div>
+    <div class="fg"><label>End Date</label><input type="date" id="spEnd"/></div>
+    <div class="modal-footer">
+      <button class="mbtn ghost" onclick="closeCreate()">Cancel</button>
+      <button class="mbtn primary" onclick="doCreate()">Create Sprint</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const API='http://localhost:9999';
+const token=localStorage.getItem('token');
+if(!token)window.location.href='login.html';
+const headers={'Content-Type':'application/json','Authorization':'Bearer '+token};
+const email=localStorage.getItem('userEmail')||'';
+document.getElementById('sideEmail').textContent=email;
+document.getElementById('sideAvatar').textContent=email?email[0].toUpperCase():'U';
+function logout(){localStorage.clear();window.location.href='login.html';}
+
+function stateBadge(s){
+  const m={PLANNED:'planned',ACTIVE:'active',COMPLETED:'completed'};
+  return`<span class="state-badge ${m[s]||'planned'}">${s||'PLANNED'}</span>`;
+}
+
+function showToast(msg,type='ok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show '+type;
+  setTimeout(()=>t.className='toast',2500);
+}
+
+async function loadSprints(){
+  const pid=document.getElementById('projInput').value||1;
+  document.getElementById('sprintsGrid').innerHTML='<div class="empty">Loading...</div>';
+  try{
+    const res=await fetch(`${API}/api/sprints/project/${pid}`,{headers});
+    if(!res.ok)throw new Error();
+    const sprints=await res.json();
+    if(!sprints.length){document.getElementById('sprintsGrid').innerHTML='<div class="empty">No sprints found for this project</div>';return;}
+    document.getElementById('sprintsGrid').innerHTML=sprints.map(s=>sprintCard(s)).join('');
+  }catch(e){
+    document.getElementById('sprintsGrid').innerHTML='<div class="empty">Could not load sprints</div>';
+  }
+}
+
+async function loadAllSprints(){
+  document.getElementById('sprintsGrid').innerHTML='<div class="empty">Loading...</div>';
+  try{
+    const res=await fetch(`${API}/api/sprints/all`,{headers});
+    if(!res.ok)throw new Error();
+    const sprints=await res.json();
+    if(!sprints.length){document.getElementById('sprintsGrid').innerHTML='<div class="empty">No sprints found</div>';return;}
+    document.getElementById('sprintsGrid').innerHTML=sprints.map(s=>sprintCard(s)).join('');
+  }catch(e){
+    document.getElementById('sprintsGrid').innerHTML='<div class="empty">Could not load sprints</div>';
+  }
+}
+
+function sprintCard(s){
+  const canStart=s.sprintState==='PLANNED';
+  const canEnd=s.sprintState==='ACTIVE';
+  return`<div class="sprint-card">
+    <div class="sc-head">
+      <div>
+        <div class="sc-name">${s.sprintName||'Sprint'}</div>
+        <div class="sc-id">ID: ${s.id}</div>
+      </div>
+      ${stateBadge(s.sprintState)}
+    </div>
+    <div class="sc-body">
+      <div class="sc-dates">
+        <div class="sc-date">Start: <span>${s.startDate||'Not set'}</span></div>
+        <div class="sc-date">End: <span>${s.endDate||'Not set'}</span></div>
+      </div>
+      <div class="sc-actions">
+        ${canStart?`<button class="sc-btn start" onclick="startSprint(${s.id})">▶ Start Sprint</button>`:''}
+        ${canEnd?`<button class="sc-btn end" onclick="endSprint(${s.id})">⏹ End Sprint</button>`:''}
+        <button class="sc-btn" onclick="location.href='reports.html'">📊 Report</button>
+        <button class="sc-btn" onclick="assignIssue(${s.id})">+ Add Issue</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function startSprint(id){
+  if(!confirm('Start this sprint?'))return;
+  try{
+    const res=await fetch(`${API}/api/sprints/${id}/start`,{method:'PUT',headers});
+    if(!res.ok)throw new Error();
+    showToast('Sprint started!','ok');loadAllSprints();
+  }catch(e){showToast('Could not start sprint','err');}
+}
+
+async function endSprint(id){
+  if(!confirm('End this sprint? Incomplete issues will go back to backlog.'))return;
+  try{
+    const res=await fetch(`${API}/api/sprints/${id}/end`,{method:'PUT',headers});
+    if(!res.ok)throw new Error();
+    showToast('Sprint ended!','ok');loadAllSprints();
+  }catch(e){showToast('Could not end sprint','err');}
+}
+
+function assignIssue(sprintId){
+  const issueId=prompt('Enter Issue ID to add to sprint '+sprintId+':');
+  if(!issueId)return;
+  fetch(`${API}/api/sprints/${sprintId}/assign/${issueId}`,{method:'POST',headers})
+    .then(r=>{if(r.ok)showToast('Issue added to sprint','ok');else showToast('Failed','err');})
+    .catch(()=>showToast('Failed','err'));
+}
+
+function openCreate(){
+  document.getElementById('spProjId').value=document.getElementById('projInput').value||'';
+  document.getElementById('createOverlay').classList.add('show');
+}
+function closeCreate(){document.getElementById('createOverlay').classList.remove('show');}
+
+async function doCreate(){
+  const name=document.getElementById('spName').value.trim();
+  const projId=document.getElementById('spProjId').value;
+  if(!name||!projId){showCAlert('Fill all required fields');return;}
+  try{
+    const res=await fetch(`${API}/api/sprints/create`,{method:'POST',headers,body:JSON.stringify({
+      sprintName:name,
+      projectId:parseInt(projId),
+      startDate:document.getElementById('spStart').value||null,
+      endDate:document.getElementById('spEnd').value||null
+    })});
+    if(!res.ok)throw new Error();
+    closeCreate();showToast('Sprint created!','ok');loadAllSprints();
+  }catch(e){showCAlert('Could not create sprint');}
+}
+
+function showCAlert(m){const el=document.getElementById('createAlert');el.textContent=m;el.className='alert err show';}
+</script>
+</body>
+</html>
