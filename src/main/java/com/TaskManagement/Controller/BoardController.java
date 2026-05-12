@@ -27,17 +27,18 @@ public class BoardController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Optional<Board>> getBoardById(@PathVariable Long id) {
-		return ResponseEntity.ok(boardService.getByBoardId(id));
+	public ResponseEntity<Board> getBoardById(@PathVariable Long id) {
+	    return boardService.getByBoardId(id)
+	        .map(ResponseEntity::ok)
+	        .orElse(ResponseEntity.notFound().build());
 	}
 
-	// FIX: URL /{id} tha lekin parameter boardId tha — mismatch
 	@GetMapping("/{boardId}/columns")
 	public ResponseEntity<List<BoardColumn>> getBoardColumns(@PathVariable Long boardId) {
 		return ResponseEntity.ok(boardService.getBoardColumns(boardId));
 	}
 
-	// FIX: do alag PathVariable chahiye the
+
 	@GetMapping("/{boardId}/cards/{columnId}")
 	public ResponseEntity<List<BoardCard>> getBoardCards(@PathVariable Long boardId, @PathVariable Long columnId) {
 		return ResponseEntity.ok(boardService.getBoardByCards(boardId, columnId));
