@@ -17,10 +17,11 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/workflows")
 @RequiredArgsConstructor
+
 public class WorkFlowController {
 
-	@Autowired
-	private WorkFlowService workFlowService;
+    private final WorkFlowService workFlowService;
+
 
 	@PostMapping("/create")
 	public ResponseEntity<WorkFlow> createWork(@RequestBody WorkFlow workFlow) {
