@@ -83,8 +83,17 @@ public class SprintService {
 		int totalTask = issues.size();
 		Map<String, Integer> chart = new LinkedHashMap<>();
 		for (LocalDate cursor = start; !cursor.isAfter(end); cursor = cursor.plusDays(1)) {
-			int completed = (int) issues.stream().filter(i -> i.getIssueStatus() == IssueStatus.DONE).count();
+
+			LocalDate currentDate = cursor;
+
+			int completed = (int) issues.stream()
+					.filter(i -> i.getIssueStatus() == IssueStatus.DONE)
+					.filter(i -> i.getUpdatedAt() != null)
+					.filter(i -> !i.getUpdatedAt().toLocalDate().isAfter(currentDate))
+					.count();
+
 			int remaining = totalTask - completed;
+
 			chart.put(cursor.toString(), remaining);
 		}
 		Map<String, Object> response = new HashMap<>();
