@@ -61,13 +61,13 @@ public class WorkFlowService {
 
 	public List<WorkFlowTransaction> allowedTransactions(Long workFlowId, IssueStatus fromStatus) {
 
-		return workflowTransactionRepo.findByWorkFlowIdAndFromStats(workFlowId, fromStatus);
+		return workflowTransactionRepo.findByWorkFlowIdAndFromStatus(workFlowId, fromStatus);
 	}
 
 	public boolean isTransactionsAllowed(Long workFlowId, IssueStatus fromStatus, IssueStatus toStatus,
 			Set<Role> userRoles) {
 
-		List<WorkFlowTransaction> transactions = workflowTransactionRepo.findByWorkFlowIdAndFromStats(workFlowId,
+		List<WorkFlowTransaction> transactions = workflowTransactionRepo.findByWorkFlowIdAndFromStatus(workFlowId,
 				fromStatus);
 
 		for (WorkFlowTransaction t : transactions) {

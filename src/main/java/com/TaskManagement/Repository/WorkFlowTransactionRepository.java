@@ -13,5 +13,5 @@ public interface WorkFlowTransactionRepository extends JpaRepository<WorkFlowTra
 
 	List<WorkFlowTransaction> findByWorkFlowId(Long workFlowId);
 
-	List<WorkFlowTransaction> findByWorkFlowIdAndFromStats(Long workFlowId, IssueStatus fromStats);
+	List<WorkFlowTransaction> findByWorkFlowIdAndFromStatus(Long workFlowId, IssueStatus fromStatus);
 }
