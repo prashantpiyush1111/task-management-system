@@ -1,10 +1,11 @@
 package com.TaskManagement.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-
 @Table(name = "board_cards", indexes = { @Index(columnList = "board_id,column_id,position") })
 @Data
 @AllArgsConstructor
@@ -21,6 +22,7 @@ public class BoardCard {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "column_id")
+	@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 	private BoardColumn column;
 
 	private Integer position;
