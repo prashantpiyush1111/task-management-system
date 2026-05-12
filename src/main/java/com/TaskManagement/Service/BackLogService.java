@@ -139,7 +139,7 @@ public class BackLogService {
 
 							Map<Long, List<Issue>> subMap = (Map<Long, List<Issue>>) epicData.get("subtask");
 
-							subMap.computeIfAbsent(projectId, k -> new ArrayList<>()).add(issue);
+							subMap.computeIfAbsent(parentId, k -> new ArrayList<>()).add(issue);
 
 							break;
 						}
