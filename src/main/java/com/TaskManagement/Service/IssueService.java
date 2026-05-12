@@ -51,7 +51,10 @@ public class IssueService {
 		issue.setReporterEmail(dto.getReporterEmail());
 		issue.setPriority(dto.getPriority());
 		issue.setDueDate(dto.getDueDate());
-		issue.setIssueKey("PROJ-" + System.currentTimeMillis());
+		issue = issueRepo.save(issue);
+		issue.setIssueKey(generateKey(issue.getId()));  
+		issueRepo.save(issue);
+		
 
 		if (dto.getLabels() != null) {
 			Set<Label> labels = new HashSet<>();
