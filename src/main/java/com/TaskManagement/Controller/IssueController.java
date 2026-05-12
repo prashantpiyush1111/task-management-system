@@ -13,6 +13,7 @@ import com.TaskManagement.Entity.IssueComment; // Entity for issue comments
 import com.TaskManagement.Entity.Sprint; // Entity for sprint
 import com.TaskManagement.Enum.IssueStatus; // Enum_for issue status
 import com.TaskManagement.Service.IssueService; // Service layer
+import java.util.HashMap;
 
 import lombok.RequiredArgsConstructor; // Lombok_annotation for constructor
 
@@ -70,8 +71,8 @@ public class IssueController {
 	}
 
 	@GetMapping("/search")
-	public ResponseEntity<List<IssueDTO>> search(@RequestParam Map<String, String> allRequestParams) {
-
-		return ResponseEntity.ok(issueService.search(allRequestParams));
+	public ResponseEntity<List<IssueDTO>> search(@RequestParam(required = false) Map<String, String> allRequestParams) {
+	    if (allRequestParams == null) allRequestParams = new HashMap<>();
+	    return ResponseEntity.ok(issueService.search(allRequestParams));
 	}
 }

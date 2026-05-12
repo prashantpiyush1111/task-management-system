@@ -222,10 +222,20 @@ function priorityBadge(p){const m={LOW:'low',MEDIUM:'medium',HIGH:'high',CRITICA
 function typeBadge(t){const m={TASK:'task',BUG:'bug',STORY:'story',EPIC:'epic',SUB_TASK:'task'};return`<span class="badge ${m[t]||'task'}">${t||'TASK'}</span>`}
 async function loadIssues(){
   try{
-    const res=await fetch(API+'/api/issues/search',{headers});
-    if(res.ok){allIssues=await res.json();applyFilters();}
-    else{document.getElementById('issueTable').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">Failed to load</div></div>';}
-  }catch(e){document.getElementById('issueTable').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">Cannot connect to server</div></div>';}
+    // search ke bajaye directly sabhi issues laao by assignee ya all
+    const res=await fetch(API+'/api/issues/search?dummy=1',{headers});
+    if(res.ok){
+      allIssues=await res.json();
+      applyFilters();
+    } else {
+      // fallback — koi issue nahi mila
+      allIssues=[];
+      applyFilters();
+      document.getElementById('issueTable').innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">No issues found. Create one!</div></div>';
+    }
+  }catch(e){
+    document.getElementById('issueTable').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">Cannot connect to server</div></div>';
+  }
 }
 function applyFilters(){
   const s=document.getElementById('searchInput').value.toLowerCase();
