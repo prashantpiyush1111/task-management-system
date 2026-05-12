@@ -32,9 +32,8 @@ public class Board {
 	@Builder.Default
 	private LocalDateTime createdAt = LocalDateTime.now();
 
-	@OneToMany(mappedBy = "board")
+	@OneToMany(mappedBy = "board", fetch = FetchType.EAGER)
 	@OrderBy("position")
-
 	@Builder.Default
 	private List<BoardColumn> columns = new ArrayList<>();
 }

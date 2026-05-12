@@ -53,8 +53,12 @@ public class BoardController {
 	}
 
 	@PostMapping("/{id}/column")
-	public ResponseEntity<Board> addColumn(@PathVariable Long id, @RequestBody BoardColumn column) {
-		column.setBoard(boardService.findById(id).orElseThrow(() -> new RuntimeException("Board not found")));
-		return ResponseEntity.ok(boardService.createBoard(column.getBoard()));
+	public ResponseEntity<BoardColumn> addColumn(
+	        @PathVariable Long id,
+	        @RequestBody BoardColumn column) {
+	    Board board = boardService.findById(id)
+	            .orElseThrow(() -> new RuntimeException("Board not found"));
+	    column.setBoard(board);
+	    return ResponseEntity.ok(boardService.addColumn(column));
 	}
 }

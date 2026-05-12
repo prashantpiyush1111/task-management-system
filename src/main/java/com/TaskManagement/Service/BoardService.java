@@ -150,4 +150,7 @@ public class BoardService {
 	@Transactional
 	public void completeSprint(Long sprintId) {
 	}
+	public BoardColumn addColumn(BoardColumn column) {
+	    return boardColumnRepo.save(column);
+	}
 }
