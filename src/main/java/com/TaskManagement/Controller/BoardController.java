@@ -19,9 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/boards")
 @RequiredArgsConstructor
 public class BoardController {
-
-	@Autowired
-	private BoardService boardService;
+    private final BoardService boardService;
 
 	@PostMapping
 	public ResponseEntity<Board> create(@RequestBody Board board) {
