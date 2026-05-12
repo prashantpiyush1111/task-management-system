@@ -18,7 +18,7 @@ public class WorkFlowTransaction {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private IssueStatus fromStats;
+	private IssueStatus fromStatus;
 	private IssueStatus toStatus;
 	private String actionName;
 	@Builder.Default
@@ -28,51 +28,4 @@ public class WorkFlowTransaction {
 	@JsonBackReference
 	private WorkFlow workFlow;
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public IssueStatus getFromStats() {
-		return fromStats;
-	}
-
-	public void setFromStats(IssueStatus fromStats) {
-		this.fromStats = fromStats;
-	}
-
-	public IssueStatus getToStatus() {
-		return toStatus;
-	}
-
-	public void setToStatus(IssueStatus toStatus) {
-		this.toStatus = toStatus;
-	}
-
-	public String getActionName() {
-		return actionName;
-	}
-
-	public void setActionName(String actionName) {
-		this.actionName = actionName;
-	}
-
-	public Set<Role> getAllowedRole() {
-		return allowedRole;
-	}
-
-	public void setAllowedRole(Set<Role> allowedRole) {
-		this.allowedRole = allowedRole;
-	}
-
-	public WorkFlow getWorkFlow() {
-		return workFlow;
-	}
-
-	public void setWorkFlow(WorkFlow workFlow) {
-		this.workFlow = workFlow;
-	}
 }
