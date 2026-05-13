@@ -14,7 +14,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class IssueDTO {
-
+	public Long id;
 	public String issueKey;
 	public String issueTitle;
 	public String issueDescription;
