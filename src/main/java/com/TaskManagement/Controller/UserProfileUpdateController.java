@@ -13,7 +13,7 @@ import com.TaskManagement.Service.UserProfileUpdateService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/user_profile-update")
+@RequestMapping("/api/user-profile-update")
 @RequiredArgsConstructor
 public class UserProfileUpdateController {
 
