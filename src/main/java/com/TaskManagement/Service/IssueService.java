@@ -132,6 +132,7 @@ public class IssueService {
 
 	private IssueDTO toDTO(Issue issue) {
 		IssueDTO dto = new IssueDTO();
+		 dto.setId(issue.getId());
 		dto.setIssueKey(issue.getIssueKey());
 		dto.setIssueTitle(issue.getIssueTitle());
 		dto.setIssueDescription(issue.getIssueDescription());
