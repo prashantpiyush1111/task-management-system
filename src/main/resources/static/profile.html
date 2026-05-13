@@ -36,7 +36,7 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--tex
 .profile-info h2{font-size:22px;font-weight:700;margin-bottom:4px}
 .profile-info .p-email{color:var(--muted);font-size:14px;margin-bottom:8px}
 .profile-info .p-role{display:inline-flex;padding:3px 12px;background:rgba(79,124,255,.12);color:var(--accent);border-radius:20px;font-size:12px;font-weight:600}
-.status-dot{width:8px;height:8px;background:var(--success);border-radius:50%;display:inline-block;margin-right:6px;box-shadow:0 0 6px var(--success)}
+.stats-dot{width:8px;height:8px;background:var(--success);border-radius:50%;display:inline-block;margin-right:6px;box-shadow:0 0 6px var(--success)}
 .section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px}
 .section-head{font-size:15px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px}
 .fg{margin-bottom:16px}
@@ -165,10 +165,11 @@ document.getElementById('heroName').textContent=email.split('@')[0]||'User';
 document.getElementById('profEmail').value=email;
 function logout(){localStorage.clear();window.location.href='login.html';}
 function showToast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+type;setTimeout(()=>t.className='toast',2500);}
+
 async function loadProfile(){
   if(!email)return;
   try{
-    const res=await fetch(`${API}/api/user_profile-update/${encodeURIComponent(email)}`,{headers});
+    const res=await fetch(`${API}/api/user-profile-update/${encodeURIComponent(email)}`,{headers});
     if(!res.ok)return;
     const d=await res.json();
     document.getElementById('profDept').value=d.department||'';
@@ -178,13 +179,15 @@ async function loadProfile(){
     if(d.designation)document.getElementById('heroRole').textContent=d.designation;
   }catch(e){}
 }
+
 async function saveProfile(){
   const dept=document.getElementById('profDept').value.trim();
   const desig=document.getElementById('profDesig').value.trim();
   const org=document.getElementById('profOrg').value.trim();
   const active=document.getElementById('profActive').checked;
   try{
-    const res=await fetch(`${API}/api/user_profile-update/update/${encodeURIComponent(email)}`,{
+    // ✅ BUG FIX — double backtick `` hataya, ek backtick rakha
+    const res=await fetch(`${API}/api/user-profile-update/update/${encodeURIComponent(email)}`,{
       method:'PUT',headers,
       body:JSON.stringify({userOfficialEmail:email,department:dept,designation:desig,organizationName:org,active})
     });
@@ -195,15 +198,16 @@ async function saveProfile(){
     const el=document.getElementById('profileAlert');el.textContent='Could not save profile';el.className='alert err show';
   }
 }
+
 async function changePassword(){
   const pw=document.getElementById('newPw').value;
   const cpw=document.getElementById('confirmPw').value;
   if(!pw||pw.length<8){showPwAlert('Password must be at least 8 characters');return;}
   if(pw!==cpw){showPwAlert('Passwords do not match');return;}
   try{
-    const res=await fetch(`${API}/api/user-auth/reset-password`,{
-      method:'POST',headers,
-      body:JSON.stringify({userOfficialEmail:email,newPassword:pw})
+  
+    const res=await fetch(`${API}/api/user-auth/reset-password?token=${token}&newPassword=${encodeURIComponent(pw)}`,{
+      method:'POST',headers
     });
     if(!res.ok)throw new Error();
     document.getElementById('newPw').value='';
@@ -211,6 +215,7 @@ async function changePassword(){
     showToast('Password updated!','ok');
   }catch(e){showPwAlert('Could not update password');}
 }
+
 function showPwAlert(m){const el=document.getElementById('pwAlert');el.textContent=m;el.className='alert err show';}
 loadProfile();
 </script>
