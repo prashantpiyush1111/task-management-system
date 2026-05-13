@@ -166,7 +166,7 @@ function wfCard(w){
   const trans=(w.transaction||[]).slice(0,4);
   const transHTML=trans.length?trans.map(t=>`
     <div class="trans-item">
-      <span class="trans-from">${t.fromStats||'?'}</span>
+      <span class="trans-from">${t.fromStatus||'?'}</span>
       <span class="trans-arrow">→</span>
       <span class="trans-to">${t.toStatus||'?'}</span>
       <span class="trans-roles">${(t.allowedRole||[]).join(', ')||'All'}</span>
@@ -239,7 +239,7 @@ async function doCreate(){
     const from=document.getElementById('tf-'+id)?.value;
     const to=document.getElementById('tt-'+id)?.value;
     const role=document.getElementById('tr2-'+id)?.value;
-    if(from&&to)transactions.push({fromStats:from,toStatus:to,allowedRole:role?[role]:[]});
+    if(from&&to)transactions.push({fromStatus:from,toStatus:to,allowedRole:role?[role]:[]});
   });
   try{
     const res=await fetch(`${API}/api/workflows/create`,{method:'POST',headers,body:JSON.stringify({
