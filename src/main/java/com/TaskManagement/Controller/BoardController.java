@@ -58,4 +58,20 @@ public class BoardController {
 	    column.setBoard(board);
 	    return ResponseEntity.ok(boardService.addColumn(column));
 	}
+	
+	@PutMapping("/{boardId}/card/{cardId}/move")
+	public ResponseEntity<Void> moveCard(
+	        @PathVariable Long boardId,
+	        @PathVariable Long cardId,
+	        @RequestBody Map<String, Object> body,
+	        @RequestHeader(value = "X-User-Email", required = false) String user) {
+	    Long columnId = Long.valueOf(String.valueOf(body.get("columnId")));
+	    int position = body.get("position") != null
+	            ? Integer.parseInt(String.valueOf(body.get("position"))) : 0;
+	    String performedBy = user != null ? user : "system";
+	    boardService.moveCards(boardId, columnId, cardId, position, performedBy);
+	    return ResponseEntity.ok().build();
+	}
+ 
 }
+ 
