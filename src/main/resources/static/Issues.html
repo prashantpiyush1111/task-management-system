@@ -252,14 +252,14 @@ function applyFilters(){
   document.getElementById('resultCount').textContent=`${filtered.length} issue${filtered.length!==1?'s':''}`;
   if(!filtered.length){document.getElementById('issueTable').innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">No issues found</div></div>';return;}
   document.getElementById('issueTable').innerHTML=filtered.map(i=>`
-    <div class="issue-row" onclick="openDetail('${i.issueKey}')">
+    onclick="openDetail(${i.id})">
       <div class="td issue-key">${i.issueKey||'—'}</div>
       <div class="td issue-title-cell"><span>${i.issueTitle||'Untitled'}</span></div>
       <div class="td">${statusBadge(i.issueStatus)}</div>
       <div class="td">${priorityBadge(i.priority)}</div>
       <div class="td">${typeBadge(i.issueType)}</div>
       <div class="td" style="font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${i.assigneeEmail||'Unassigned'}</div>
-      <div class="td"><button class="action-btn" onclick="event.stopPropagation();openDetail('${i.issueKey}')">👁</button></div>
+      <div class="td"><button class="action-btn" onclick="event.stopPropagation();openDetail(${i.id})">👁</button></div>
     </div>`).join('');
 }
 function clearFilters(){
@@ -269,9 +269,9 @@ function clearFilters(){
   document.getElementById('typeFilter').value='';
   applyFilters();
 }
-async function openDetail(key){
+async function openDetail(id){
   try{
-    const res=await fetch(API+'/api/issues/'+key,{headers});
+    const res=await fetch(API+'/api/issues/'+id,{headers});
     if(!res.ok)return;
     const i=await res.json();
     document.getElementById('detailPanel').innerHTML=`
@@ -290,7 +290,7 @@ async function openDetail(key){
       <div class="det-section"><div class="det-label">Description</div><div class="det-val" style="line-height:1.6;color:#d1d5db">${i.issueDescription||'No description'}</div></div>
       <div class="det-section">
         <div class="det-label">Update Status</div>
-        <select onchange="updateStatus('${i.issueKey}',this.value)" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;width:100%">
+        <select onchange="updateStatus(${i.id}, this.value)" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;width:100%">
           ${['OPEN','TODO','IN_PROGRESS','IN_REVIEW','DONE','BLOCKED','CLOSED'].map(s=>`<option value="${s}" ${i.issueStatus===s?'selected':''}>${s}</option>`).join('')}
         </select>
       </div>
@@ -298,7 +298,7 @@ async function openDetail(key){
         <div class="det-label">Add Comment</div>
         <div class="add-comment"><textarea id="commentText" placeholder="Write a comment..."></textarea></div>
         <div style="display:flex;justify-content:flex-end;margin-top:8px">
-          <button class="mbtn primary" onclick="addComment('${i.issueKey}')" style="padding:8px 18px;font-size:13px">Post Comment</button>
+          <button class="mbtn primary" onclick="addComment(${i.id})"" style="padding:8px 18px;font-size:13px">Post Comment</button>
         </div>
       </div>`;
     document.getElementById('detailOverlay').classList.add('show');
