@@ -1,8 +1,4 @@
 package com.TaskManagement.Controller;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-// Used to send HTTP responses
 import org.springframework.http.ResponseEntity;
 
 // Used for REST APIs and request mappings
@@ -26,8 +22,6 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 public class IssueController {
-
-	@Autowired
 	private IssueService issueService;
 
 	@PostMapping("/createIssue")
@@ -48,7 +42,7 @@ public class IssueController {
 
 	@PostMapping("/{id}/comment")
 	public ResponseEntity<IssueComment> addComment(@PathVariable Long id, @RequestBody Map<String, String> body,
-			@RequestHeader(value = "X_User_Email", required = false) String user) {
+			@RequestHeader(value = "X-User-Email", required = false) String user) {
 
 		String commentBody = body.get("body");
 

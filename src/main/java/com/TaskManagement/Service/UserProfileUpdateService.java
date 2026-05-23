@@ -3,7 +3,6 @@ package com.TaskManagement.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Service;
 
 import com.TaskManagement.DTO.UserProfileUpdateDTO;
 import com.TaskManagement.Entity.UserProfileUpdate;
@@ -11,7 +10,7 @@ import com.TaskManagement.Repository.UserProfileUpdateRepository;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
+
 @RequiredArgsConstructor
 public class UserProfileUpdateService {
 	private final UserProfileUpdateRepository userProfileRepo;
