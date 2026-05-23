@@ -96,6 +96,7 @@ public class IssueService {
 		}
 
 		issue.setIssueStatus(status);
+		issue.setUpdatedAt(java.time.LocalDateTime.now());
 		issueRepo.save(issue);
 		return toDTO(issue);
 	}
