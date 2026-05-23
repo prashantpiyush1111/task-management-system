@@ -3,7 +3,6 @@ package com.TaskManagement.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.TaskManagement.DTO.UserProfileUpdateDTO;
@@ -15,14 +14,12 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class UserProfileUpdateService {
-
-	@Autowired
-	private UserProfileUpdateRepository userProfileRepo;
+	private final UserProfileUpdateRepository userProfileRepo;
 
 	public UserProfileUpdate updateUserProfile(UserProfileUpdateDTO updateProfile) {
 
 		UserProfileUpdate user = userProfileRepo.findByUserOfficialEmail(updateProfile.userOfficialEmail)
-				.orElseThrow(() -> new RuntimeException("User not ound"));
+				.orElseThrow(() -> new RuntimeException("User not Found"));
 
 		user.setDepartment(updateProfile.department);
 		user.setDesignation(updateProfile.designation);
@@ -38,7 +35,7 @@ public class UserProfileUpdateService {
 
 	public UserProfileUpdateDTO getUserProfileByEmail(String userOfficialEmail) {
 		UserProfileUpdate user = userProfileRepo.findByUserOfficialEmail(userOfficialEmail)
-				.orElseThrow(() -> new RuntimeException("User not ound"));
+				.orElseThrow(() -> new RuntimeException("User not Found"));
 		return toDTO(user);
 
 	}
