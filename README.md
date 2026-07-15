@@ -101,7 +101,7 @@ The application follows a modular layered architecture approach to ensure:
 
 ## Security
 
-* JWT Authentication
+**JWT Authentication
 
 ## Cloud Storage
 
