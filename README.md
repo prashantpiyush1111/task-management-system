@@ -156,7 +156,7 @@ This architecture improves:
 
 ---
 
-# 🔐 Security Implementation
+#  Security Implementation
 
 Security was implemented using:
 
