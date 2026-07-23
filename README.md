@@ -230,7 +230,7 @@ Open the project in:
 
 ## 3️⃣ Configure Database
 
-Update `application.properties`
+Update `application-prod.properties`
 
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/task_management
