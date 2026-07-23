@@ -101,7 +101,7 @@ The application follows a modular layered architecture approach to ensure:
 
 ## Security
 
-* JWT Authentication
+**JWT Authentication
 
 ## Cloud Storage
 
@@ -156,7 +156,7 @@ This architecture improves:
 
 ---
 
-# 🔐 Security Implementation
+#  Security Implementation
 
 Security was implemented using:
 
@@ -287,6 +287,7 @@ Through this project, practical experience was gained in:
 ## Prashant Maurya
 
 Java Full Stack Developer
+developer 
 
 ---
 
