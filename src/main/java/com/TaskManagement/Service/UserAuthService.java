@@ -12,7 +12,9 @@ import com.TaskManagement.DTO.AuthResponseDTO;
 import com.TaskManagement.DTO.RegisterRequestDTO;
 import com.TaskManagement.DTO.LoginRequestDTO;
 import com.TaskManagement.Entity.UserAuth;
+import com.TaskManagement.Entity.UserProfileUpdate;
 import com.TaskManagement.Repository.UserAuthRepository;
+import com.TaskManagement.Repository.UserProfileUpdateRepository;
 import com.TaskManagement.Security.EmailService;
 import com.TaskManagement.Security.JWTUtil;
 
@@ -21,6 +23,9 @@ public class UserAuthService {
 
 	@Autowired
 	private UserAuthRepository userAuthRepo;
+
+	@Autowired
+	private UserProfileUpdateRepository userProfileUpdateRepo;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -33,7 +38,8 @@ public class UserAuthService {
 
 	public AuthResponseDTO register(RegisterRequestDTO register) {
 
-		Optional<UserAuth> existing = userAuthRepo.findByUserOfficialEmail(register.getUserOfficialEmail());
+		Optional<UserAuth> existing = userAuthRepo
+				.findByUserOfficialEmail(register.getUserOfficialEmail());
 
 		if (existing.isPresent()) {
 			throw new RuntimeException("User already exists");
@@ -47,6 +53,14 @@ public class UserAuthService {
 
 		userAuthRepo.save(user);
 
+		// Create default profile for the newly registered user
+		UserProfileUpdate profile = UserProfileUpdate.builder()
+				.userOfficialEmail(user.getUserOfficialEmail())
+				.active(true)
+				.build();
+
+		userProfileUpdateRepo.save(profile);
+
 		String token = jwtUtil.generateToken(user);
 
 		return new AuthResponseDTO(token, "User Registered Successfully");
@@ -54,11 +68,11 @@ public class UserAuthService {
 
 	public AuthResponseDTO login(LoginRequestDTO login) {
 
-		UserAuth user = userAuthRepo.findByUserOfficialEmail(login.getUserOfficialEmail())
+		UserAuth user = userAuthRepo
+				.findByUserOfficialEmail(login.getUserOfficialEmail())
 				.orElseThrow(() -> new RuntimeException("User not found"));
 
 		if (!passwordEncoder.matches(login.getPassword(), user.getPassword())) {
-
 			throw new RuntimeException("Invalid credentials");
 		}
 
@@ -69,7 +83,8 @@ public class UserAuthService {
 
 	public void forgotPassword(String userOfficialEmail) {
 
-		UserAuth user = userAuthRepo.findByUserOfficialEmail(userOfficialEmail)
+		UserAuth user = userAuthRepo
+				.findByUserOfficialEmail(userOfficialEmail)
 				.orElseThrow(() -> new RuntimeException("User not found"));
 
 		String token = UUID.randomUUID().toString();
@@ -84,10 +99,11 @@ public class UserAuthService {
 
 	public void resetPassword(String token, String newPassword) {
 
-		UserAuth user = userAuthRepo.findByResetToken(token).orElseThrow(() -> new RuntimeException("Invalid token"));
+		UserAuth user = userAuthRepo
+				.findByResetToken(token)
+				.orElseThrow(() -> new RuntimeException("Invalid token"));
 
 		if (user.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
-
 			throw new RuntimeException("Token expired");
 		}
 
