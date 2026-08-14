@@ -138,7 +138,17 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-			
+			<!-- common login jar-->
+			<dependency>
+				<groupId>some-library</groupId>
+				<artifactId>some-library</artifactId>
+				<exclusions>
+					<exclusion>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
 		</dependencies>
 
 	</dependencyManagement>
