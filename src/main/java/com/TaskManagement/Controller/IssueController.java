@@ -22,7 +22,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 public class IssueController {
-	private IssueService issueService;
+	private final IssueService issueService;
 
 	@PostMapping("/createIssue")
 	public ResponseEntity<IssueDTO> createIssue(@RequestBody IssueDTO issues) {
