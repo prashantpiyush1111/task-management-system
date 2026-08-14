@@ -52,7 +52,7 @@ public class IssueController {
 	}
 
 	@PatchMapping("/{id}/status")
-	public ResponseEntity<IssueDTO> updateStatus(@PathVariable Long id, @RequestParam IssueStatus issueStatus,
+	public ResponseEntity<IssueDTO> updateStatus(@PathVariable Long id, @RequestParam("status") IssueStatus issueStatus,
 			@RequestHeader(value = "X_User_Email", required = false) String user) {
 
 		return ResponseEntity.ok(issueService.updateIssueStatus(id, issueStatus, user));
