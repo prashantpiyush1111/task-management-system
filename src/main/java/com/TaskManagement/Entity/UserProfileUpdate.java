@@ -1,89 +1,116 @@
-package com.TaskManagement.Entity;
+package com.TaskManagement.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
-import jakarta.persistence.*;
-import lombok.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
-@Entity
-@Table(name = "profile_updates")
+import com.TaskManagement.DTO.AuthResponseDTO;
+import com.TaskManagement.DTO.RegisterRequestDTO;
+import com.TaskManagement.DTO.LoginRequestDTO;
+import com.TaskManagement.Entity.UserAuth;
+import com.TaskManagement.Entity.UserProfileUpdate;
+import com.TaskManagement.Repository.UserAuthRepository;
+import com.TaskManagement.Repository.UserProfileUpdateRepository;
+import com.TaskManagement.Security.EmailService;
+import com.TaskManagement.Security.JWTUtil;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class UserProfileUpdate {
+@Service
+public class UserAuthService {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	@Autowired
+	private UserAuthRepository userAuthRepo;
 
-	@Column(nullable = false, unique = true)
-	private String userOfficialEmail;
+	@Autowired
+	private UserProfileUpdateRepository userProfileUpdateRepo;
 
-	private String department;
-	private String designation;
-	private String organizationName;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
-	private boolean active;
+	@Autowired
+	private JWTUtil jwtUtil;
 
-	@Builder.Default
-	private LocalDateTime createdAt = LocalDateTime.now();
+	@Autowired
+	private EmailService emailService;
 
-	public Long getId() {
-		return id;
+	public AuthResponseDTO register(RegisterRequestDTO register) {
+
+		Optional<UserAuth> existing = userAuthRepo
+				.findByUserOfficialEmail(register.getUserOfficialEmail());
+
+		if (existing.isPresent()) {
+			throw new RuntimeException("User already exists");
+		}
+
+		UserAuth user = new UserAuth();
+		user.setUserName(register.getUserName());
+		user.setUserOfficialEmail(register.getUserOfficialEmail());
+		user.setPassword(passwordEncoder.encode(register.getPassword()));
+		user.setRole(register.getRole());
+
+		userAuthRepo.save(user);
+
+		// Create default profile for the newly registered user
+		UserProfileUpdate profile = UserProfileUpdate.builder()
+				.userOfficialEmail(user.getUserOfficialEmail())
+				.active(true)
+				.build();
+
+		userProfileUpdateRepo.save(profile);
+
+		String token = jwtUtil.generateToken(user);
+
+		return new AuthResponseDTO(token, "User Registered Successfully");
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public AuthResponseDTO login(LoginRequestDTO login) {
+
+		UserAuth user = userAuthRepo
+				.findByUserOfficialEmail(login.getUserOfficialEmail())
+				.orElseThrow(() -> new RuntimeException("User not found"));
+
+		if (!passwordEncoder.matches(login.getPassword(), user.getPassword())) {
+			throw new RuntimeException("Invalid credentials");
+		}
+
+		String token = jwtUtil.generateToken(user);
+
+		return new AuthResponseDTO(token, "Login Successful");
 	}
 
-	public String getUserOfficialEmail() {
-		return userOfficialEmail;
+	public void forgotPassword(String userOfficialEmail) {
+
+		UserAuth user = userAuthRepo
+				.findByUserOfficialEmail(userOfficialEmail)
+				.orElseThrow(() -> new RuntimeException("User not found"));
+
+		String token = UUID.randomUUID().toString();
+
+		user.setResetToken(token);
+		user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(10));
+
+		userAuthRepo.save(user);
+
+		emailService.sendResetPassword(userOfficialEmail, token);
 	}
 
-	public void setUserOfficialEmail(String userOfficialEmail) {
-		this.userOfficialEmail = userOfficialEmail;
-	}
+	public void resetPassword(String token, String newPassword) {
 
-	public String getDepartment() {
-		return department;
-	}
+		UserAuth user = userAuthRepo
+				.findByResetToken(token)
+				.orElseThrow(() -> new RuntimeException("Invalid token"));
 
-	public void setDepartment(String department) {
-		this.department = department;
-	}
+		if (user.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
+			throw new RuntimeException("Token expired");
+		}
 
-	public String getDesignation() {
-		return designation;
-	}
+		user.setPassword(passwordEncoder.encode(newPassword));
+		user.setResetToken(null);
+		user.setResetTokenExpiry(null);
 
-	public void setDesignation(String designation) {
-		this.designation = designation;
+		userAuthRepo.save(user);
 	}
-
-	public String getOrganizationName() {
-		return organizationName;
-	}
-
-	public void setOrganizationName(String organizationName) {
-		this.organizationName = organizationName;
-	}
-
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public boolean isActive() {
-		return active;
-	}
-
-	public void setActive(boolean active) {
-		this.active = active;
-	}
-
 }
