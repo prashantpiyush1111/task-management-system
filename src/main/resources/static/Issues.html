@@ -252,7 +252,7 @@ function applyFilters(){
   document.getElementById('resultCount').textContent=`${filtered.length} issue${filtered.length!==1?'s':''}`;
   if(!filtered.length){document.getElementById('issueTable').innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">No issues found</div></div>';return;}
   document.getElementById('issueTable').innerHTML=filtered.map(i=>`
-    onclick="openDetail(${i.id})">
+     <div class="issue-row" onclick="openDetail(${i.id})">
       <div class="td issue-key">${i.issueKey||'—'}</div>
       <div class="td issue-title-cell"><span>${i.issueTitle||'Untitled'}</span></div>
       <div class="td">${statusBadge(i.issueStatus)}</div>
