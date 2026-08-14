@@ -307,7 +307,7 @@ async function openDetail(id){
 function closeDetail(e){if(!e||e.target===document.getElementById('detailOverlay'))document.getElementById('detailOverlay').classList.remove('show');}
 async function updateStatus(key,status){
   try{
-    const res=await fetch(`${API}/api/issues/${key}/status?issueStatus=${status}`,{method:'PATCH',headers});
+    const res=await fetch(`${API}/api/issues/${key}/status?status=${status}`,{method:'PATCH',headers});
     if(res.ok)loadIssues();
   }catch(e){}
 }
