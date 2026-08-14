@@ -27,7 +27,7 @@ public class JWTUtil {
 		String secret = System.getenv("JWT_SECRET");
 
 		if (secret == null || secret.isBlank()) {
-			secret = "Replace_this_with_secret_key_1234567890123456";
+		    throw new IllegalStateException("JWT_SECRET environment variable is not set");
 		}
 
 		key = Keys.hmacShaKeyFor(secret.getBytes());
