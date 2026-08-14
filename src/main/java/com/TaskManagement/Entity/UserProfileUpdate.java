@@ -1,116 +1,90 @@
-package com.TaskManagement.Service;
+package com.TaskManagement.Entity;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
-import com.TaskManagement.DTO.AuthResponseDTO;
-import com.TaskManagement.DTO.RegisterRequestDTO;
-import com.TaskManagement.DTO.LoginRequestDTO;
-import com.TaskManagement.Entity.UserAuth;
-import com.TaskManagement.Entity.UserProfileUpdate;
-import com.TaskManagement.Repository.UserAuthRepository;
-import com.TaskManagement.Repository.UserProfileUpdateRepository;
-import com.TaskManagement.Security.EmailService;
-import com.TaskManagement.Security.JWTUtil;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Service
-public class UserAuthService {
+@Entity
+@Table(name = "profile_updates")
 
-	@Autowired
-	private UserAuthRepository userAuthRepo;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UserProfileUpdate {
 
-	@Autowired
-	private UserProfileUpdateRepository userProfileUpdateRepo;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+	@Column(nullable = false, unique = true)
+	private String userOfficialEmail;
 
-	@Autowired
-	private JWTUtil jwtUtil;
+	private String department;
+	private String designation;
+	private String organizationName;
 
-	@Autowired
-	private EmailService emailService;
+	private boolean active;
 
-	public AuthResponseDTO register(RegisterRequestDTO register) {
+	@Builder.Default
+	private LocalDateTime createdAt = LocalDateTime.now();
 
-		Optional<UserAuth> existing = userAuthRepo
-				.findByUserOfficialEmail(register.getUserOfficialEmail());
-
-		if (existing.isPresent()) {
-			throw new RuntimeException("User already exists");
-		}
-
-		UserAuth user = new UserAuth();
-		user.setUserName(register.getUserName());
-		user.setUserOfficialEmail(register.getUserOfficialEmail());
-		user.setPassword(passwordEncoder.encode(register.getPassword()));
-		user.setRole(register.getRole());
-
-		userAuthRepo.save(user);
-
-		// Create default profile for the newly registered user
-		UserProfileUpdate profile = UserProfileUpdate.builder()
-				.userOfficialEmail(user.getUserOfficialEmail())
-				.active(true)
-				.build();
-
-		userProfileUpdateRepo.save(profile);
-
-		String token = jwtUtil.generateToken(user);
-
-		return new AuthResponseDTO(token, "User Registered Successfully");
+	public Long getId() {
+		return id;
 	}
 
-	public AuthResponseDTO login(LoginRequestDTO login) {
-
-		UserAuth user = userAuthRepo
-				.findByUserOfficialEmail(login.getUserOfficialEmail())
-				.orElseThrow(() -> new RuntimeException("User not found"));
-
-		if (!passwordEncoder.matches(login.getPassword(), user.getPassword())) {
-			throw new RuntimeException("Invalid credentials");
-		}
-
-		String token = jwtUtil.generateToken(user);
-
-		return new AuthResponseDTO(token, "Login Successful");
+	public void setId(Long id) {
+		this.id = id;
 	}
 
-	public void forgotPassword(String userOfficialEmail) {
-
-		UserAuth user = userAuthRepo
-				.findByUserOfficialEmail(userOfficialEmail)
-				.orElseThrow(() -> new RuntimeException("User not found"));
-
-		String token = UUID.randomUUID().toString();
-
-		user.setResetToken(token);
-		user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(10));
-
-		userAuthRepo.save(user);
-
-		emailService.sendResetPassword(userOfficialEmail, token);
+	public String getUserOfficialEmail() {
+		return userOfficialEmail;
 	}
 
-	public void resetPassword(String token, String newPassword) {
-
-		UserAuth user = userAuthRepo
-				.findByResetToken(token)
-				.orElseThrow(() -> new RuntimeException("Invalid token"));
-
-		if (user.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
-			throw new RuntimeException("Token expired");
-		}
-
-		user.setPassword(passwordEncoder.encode(newPassword));
-		user.setResetToken(null);
-		user.setResetTokenExpiry(null);
-
-		userAuthRepo.save(user);
+	public void setUserOfficialEmail(String userOfficialEmail) {
+		this.userOfficialEmail = userOfficialEmail;
 	}
+
+	public String getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+
+	public String getDesignation() {
+		return designation;
+	}
+
+	public void setDesignation(String designation) {
+		this.designation = designation;
+	}
+
+	public String getOrganizationName() {
+		return organizationName;
+	}
+
+	public void setOrganizationName(String organizationName) {
+		this.organizationName = organizationName;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
 }
