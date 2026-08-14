@@ -184,7 +184,7 @@ select option{background:var(--card)}
 </div>
 
 <script>
-const API = 'http://localhost:9999';
+const API = window.location.origin;
 
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));

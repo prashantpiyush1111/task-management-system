@@ -152,7 +152,7 @@ input:checked+.toggle-slider:before{transform:translateX(20px)}
 </div>
 <div class="toast" id="toast"></div>
 <script>
-const API='http://localhost:9999';
+const API = window.location.origin;
 const token=localStorage.getItem('token');
 if(!token)window.location.href='login.html';
 const headers={'Content-Type':'application/json','Authorization':'Bearer '+token};

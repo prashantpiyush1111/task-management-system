@@ -178,7 +178,7 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--tex
 <div class="toast" id="toast"></div>
 
 <script>
-const API='http://localhost:9999';
+const API = window.location.origin;
 const token=localStorage.getItem('token');
 if(!token)window.location.href='login.html';
 const headers={'Authorization':'Bearer '+token};

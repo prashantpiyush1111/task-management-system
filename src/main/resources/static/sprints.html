@@ -140,7 +140,7 @@ select option{background:var(--card2)}
 </div>
 <div class="toast" id="toast"></div>
 <script>
-const API='http://localhost:9999';
+const API = window.location.origin;
 const token=localStorage.getItem('token');
 if(!token)window.location.href='login.html';
 const headers={'Content-Type':'application/json','Authorization':'Bearer '+token};
