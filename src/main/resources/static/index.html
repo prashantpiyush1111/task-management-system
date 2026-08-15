@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TaskFlow — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0b0f;--surface:#111318;--card:#161a22;--border:#1e2330;
+  --accent:#4f7cff;--accent2:#7c5cfc;--success:#22c55e;--danger:#ef4444;
+  --text:#e8eaf0;--muted:#6b7280;
+}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;overflow:hidden}
+/* LEFT */
+.left{width:55%;position:relative;background:linear-gradient(135deg,#0d1117,#0f172a,#0d1117);display:flex;flex-direction:column;justify-content:center;padding:80px;overflow:hidden}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(79,124,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(79,124,255,.04) 1px,transparent 1px);background-size:40px 40px}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.15}
+.orb1{width:400px;height:400px;background:#4f7cff;top:-100px;left:-100px;animation:float 8s ease-in-out infinite}
+.orb2{width:300px;height:300px;background:#7c5cfc;bottom:50px;right:80px;animation:float 10s ease-in-out infinite reverse}
+.orb3{width:200px;height:200px;background:#22c55e;top:50%;left:40%;animation:float 12s ease-in-out infinite 2s}
+@keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.05)}}
+.brand{position:relative;z-index:1;display:flex;align-items:center;gap:12px;margin-bottom:56px}
+.logo-box{width:48px;height:48px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.brand-name{font-size:26px;font-weight:700;letter-spacing:-.5px}.brand-name span{color:var(--accent)}
+.hero{position:relative;z-index:1}
+.hero h1{font-size:54px;font-weight:700;line-height:1.08;letter-spacing:-2px;margin-bottom:18px}
+.hero h1 .hl{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--muted);font-size:16px;line-height:1.7;max-width:420px;margin-bottom:48px}
+.features{position:relative;z-index:1;display:flex;flex-direction:column;gap:14px}
+.feat{display:flex;align-items:center;gap:12px;color:#9ca3af;font-size:14px}
+.dot{width:8px;height:8px;background:var(--accent);border-radius:50%;flex-shrink:0;box-shadow:0 0 8px var(--accent)}
+/* RIGHT */
+.right{width:45%;display:flex;align-items:center;justify-content:center;padding:60px 48px;background:var(--surface);border-left:1px solid var(--border)}
+.auth-box{width:100%;max-width:400px}
+.tabs{display:flex;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:36px}
+.tab{flex:1;padding:10px;border:none;background:transparent;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:500;border-radius:9px;cursor:pointer;transition:all .2s}
+.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.form-title{font-size:26px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px}
+.form-sub{color:var(--muted);font-size:14px;margin-bottom:28px}
+.fg{margin-bottom:18px}
+label{display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:7px;text-transform:uppercase;letter-spacing:.8px}
+.iw{position:relative}
+.iw .ic{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;pointer-events:none}
+input,select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px 12px 40px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,124,255,.12)}
+select option{background:var(--card)}
+.btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s,transform .1s;margin-top:6px;letter-spacing:.2px}
+.btn:hover{opacity:.9;transform:translateY(-1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.forgot{text-align:right;margin-top:-10px;margin-bottom:16px}
+.forgot a{color:var(--accent);font-size:13px;text-decoration:none}
+.forgot a:hover{text-decoration:underline}
+.alert{padding:11px 14px;border-radius:8px;font-size:13px;margin-bottom:18px;display:none}
+.alert.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171}
+.alert.ok{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#4ade80}
+.alert.show{display:block;animation:slidein .25s ease}
+@keyframes slidein{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fs{display:none}.fs.active{display:block}
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:200}
+.overlay.show{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:36px;width:360px;position:relative;animation:min .25s ease}
+@keyframes min{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.modal h3{font-size:20px;font-weight:700;margin-bottom:6px}
+.modal p{color:var(--muted);font-size:14px;margin-bottom:24px}
+.modal-x{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1}
+.modal-x:hover{color:var(--text)}
+.btn2{width:100%;padding:11px;background:transparent;border:1px solid var(--border);border-radius:9px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:14px;cursor:pointer;margin-top:8px;transition:all .2s}
+.btn2:hover{border-color:var(--accent);color:var(--accent)}
+@media(max-width:768px){.left{display:none}.right{width:100%}}
+</style>
+</head>
+<body>
+
+<div class="left">
+  <div class="grid-bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <div class="brand">
+    <div class="logo-box">⚡</div>
+    <div class="brand-name">Task<span>Flow</span></div>
+  </div>
+  <div class="hero">
+    <h1>Manage Work<br><span class="hl">Smarter.</span></h1>
+    <p>Enterprise-grade project management for modern teams. Track issues, run sprints, and ship faster.</p>
+  </div>
+  <div class="features">
+    <div class="feat"><div class="dot"></div>Kanban &amp; Scrum Board</div>
+    <div class="feat"><div class="dot"></div>Sprint Planning &amp; Burndown Reports</div>
+    <div class="feat"><div class="dot"></div>GitHub, Jenkins &amp; Docker Integration</div>
+    <div class="feat"><div class="dot"></div>Role-based Access Control</div>
+  </div>
+</div>
+
+<div class="right">
+  <div class="auth-box">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('login')">Sign In</button>
+      <button class="tab" onclick="switchTab('register')">Create Account</button>
+    </div>
+
+    <div class="alert err" id="alertBox"></div>
+
+    <!-- LOGIN -->
+    <div class="fs active" id="loginForm">
+      <div class="form-title">Welcome back</div>
+      <div class="form-sub">Sign in to your TaskFlow account</div>
+      <div class="fg">
+        <label>Email Address</label>
+        <div class="iw"><span class="ic">✉</span>
+          <input type="email" id="loginEmail" placeholder="you@company.com"/>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Password</label>
+        <div class="iw"><span class="ic">🔒</span>
+          <input type="password" id="loginPassword" placeholder="Your password"/>
+        </div>
+      </div>
+      <div class="forgot"><a href="#" onclick="openForgot(event)">Forgot password?</a></div>
+      <button class="btn" id="loginBtn" onclick="doLogin()">Sign In</button>
+    </div>
+
+    <!-- REGISTER -->
+    <div class="fs" id="registerForm">
+      <div class="form-title">Get started</div>
+      <div class="form-sub">Create your TaskFlow account</div>
+      <div class="fg">
+        <label>Full Name</label>
+        <div class="iw"><span class="ic">👤</span>
+          <input type="text" id="regName" placeholder="Your full name"/>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Email Address</label>
+        <div class="iw"><span class="ic">✉</span>
+          <input type="email" id="regEmail" placeholder="you@company.com"/>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Password</label>
+        <div class="iw"><span class="ic">🔒</span>
+          <input type="password" id="regPassword" placeholder="Min 8 characters"/>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Role</label>
+        <div class="iw"><span class="ic">🏷</span>
+          <select id="regRole">
+            <option value="">Select role</option>
+            <option value="ADMIN">Admin</option>
+            <option value="MANAGER">Manager</option>
+            <option value="DEVELOPER">Developer</option>
+            <option value="TESTER">Tester</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" id="regBtn" onclick="doRegister()">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div class="overlay" id="forgotOverlay">
+  <div class="modal">
+    <button class="modal-x" onclick="closeForgot()">✕</button>
+    <h3>Reset Password</h3>
+    <p>Enter your email and we'll send a reset link.</p>
+    <div class="alert ok" id="forgotAlert"></div>
+    <div class="fg">
+      <label>Email Address</label>
+      <div class="iw"><span class="ic">✉</span>
+        <input type="email" id="forgotEmail" placeholder="you@company.com"/>
+      </div>
+    </div>
+    <button class="btn" onclick="doForgot()">Send Reset Link</button>
+    <button class="btn2" onclick="closeForgot()">Cancel</button>
+  </div>
+</div>
+
+<script>
+const API = window.location.origin;
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
+  document.getElementById('loginForm').classList.toggle('active', tab==='login');
+  document.getElementById('registerForm').classList.toggle('active', tab==='register');
+  hideAlert();
+}
+
+function showAlert(msg, type='err') {
+  const el = document.getElementById('alertBox');
+  el.textContent = msg;
+  el.className = 'alert ' + type + ' show';
+}
+function hideAlert() {
+  const el = document.getElementById('alertBox');
+  el.className = 'alert err';
+}
+
+function setLoading(btnId, loading, text) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  btn.innerHTML = loading ? `<span class="spin"></span>Please wait...` : text;
+}
+
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) { showAlert('Please fill all fields'); return; }
+  setLoading('loginBtn', true, 'Sign In');
+  try {
+    const res = await fetch(API + '/api/user-auth/login', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ userOfficialEmail: email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Login failed');
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('userEmail', email);
+    showAlert('Login successful! Redirecting...', 'ok');
+    setTimeout(() => window.location.href = 'dashboard.html', 1000);
+  } catch(e) {
+    showAlert(e.message);
+  } finally {
+    setLoading('loginBtn', false, 'Sign In');
+  }
+}
+
+async function doRegister() {
+  const userName = document.getElementById('regName').value.trim();
+  const userOfficialEmail = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const role = document.getElementById('regRole').value;
+  if (!userName||!userOfficialEmail||!password||!role) { showAlert('Please fill all fields'); return; }
+  if (password.length < 8) { showAlert('Password must be at least 8 characters'); return; }
+  setLoading('regBtn', true, 'Create Account');
+  try {
+    const res = await fetch(API + '/api/user-auth/register', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ userName, userOfficialEmail, password, role })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Registration failed');
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('userEmail', userOfficialEmail);
+    showAlert('Account created! Redirecting...', 'ok');
+    setTimeout(() => window.location.href = 'dashboard.html', 1000);
+  } catch(e) {
+    showAlert(e.message);
+  } finally {
+    setLoading('regBtn', false, 'Create Account');
+  }
+}
+
+function openForgot(e) { e&&e.preventDefault(); document.getElementById('forgotOverlay').classList.add('show'); }
+function closeForgot() { document.getElementById('forgotOverlay').classList.remove('show'); document.getElementById('forgotEmail').value=''; document.getElementById('forgotAlert').className='alert ok'; }
+
+async function doForgot() {
+  const email = document.getElementById('forgotEmail').value.trim();
+  if (!email) return;
+  try {
+    const res = await fetch(API + '/api/user-auth/forgot-password?userOfficialEmail=' + encodeURIComponent(email), { method:'POST' });
+    if (!res.ok) throw new Error('Failed');
+    const el = document.getElementById('forgotAlert');
+    el.textContent = 'Reset link sent to ' + email;
+    el.className = 'alert ok show';
+    setTimeout(closeForgot, 2500);
+  } catch(e) {
+    const el = document.getElementById('forgotAlert');
+    el.textContent = 'Could not send email. Try again.';
+    el.className = 'alert err show';
+  }
+}
+
+// Redirect if already logged in
+if (localStorage.getItem('token')) window.location.href = 'dashboard.html';
+</script>
+</body>
+</html>
