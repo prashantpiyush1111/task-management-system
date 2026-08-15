@@ -17,7 +17,7 @@ public class EmailService {
 
 	public void sendResetPassword(String to, String token) {
 
-		String resetLink = "http://localhost:9999/api/user-auth/reset-password?token=" + token;
+		String resetLink = "http://localhost:9999/reset-password.html?token=" + token;
 
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setFrom(fromEmail);
