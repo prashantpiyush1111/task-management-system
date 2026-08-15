@@ -15,9 +15,12 @@ public class EmailService {
 	@Value("${spring.mail.username}")
 	private String fromEmail;
 
+	@Value("${app.base-url:http://localhost:9999}")
+	private String baseUrl;
+
 	public void sendResetPassword(String to, String token) {
 
-		String resetLink = "http://localhost:9999/reset-password.html?token=" + token;
+		String resetLink = baseUrl + "/reset-password.html?token=" + token;
 
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setFrom(fromEmail);
