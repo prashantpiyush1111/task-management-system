@@ -77,9 +77,7 @@ public class SecurityConfig {
                     "/api/user-auth/register",
                     "/api/user-auth/login",
                     "/api/user-auth/forgot-password",
-                    "/api/user-auth/reset-password",
-
-                    "/api/user-profile-update/**"
+                    "/api/user-auth/reset-password"
                 )
                 .permitAll()
 
