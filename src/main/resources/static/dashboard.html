@@ -336,5 +336,34 @@ function showCAlert(m){const el=document.getElementById('createAlert');el.textCo
 loadDashboard();
 loadPendingBadge();
 </script>
+
+<script>
+    let idleTimer;
+
+    const IDLE_TIME = 5 * 60 * 1000; // 5 minutes
+
+    function resetIdleTimer() {
+        clearTimeout(idleTimer);
+
+        idleTimer = setTimeout(() => {
+            localStorage.removeItem("token");
+            localStorage.removeItem("jwtToken");
+            localStorage.removeItem("user");
+            localStorage.removeItem("userEmail");
+            sessionStorage.clear();
+
+            alert("You have been logged out due to inactivity.");
+            window.location.href = "login.html";
+        }, IDLE_TIME);
+    }
+
+    ["mousemove", "mousedown", "keydown", "scroll", "touchstart", "click"]
+        .forEach(event => {
+            document.addEventListener(event, resetIdleTimer);
+        });
+
+    resetIdleTimer();
+</script>
+
 </body>
 </html>
