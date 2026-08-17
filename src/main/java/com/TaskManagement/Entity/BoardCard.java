@@ -19,6 +19,7 @@ public class BoardCard {
  
 	private Long boardId;
 	private Long issueId;
+	private Long organizationId;
  
 	@ManyToOne(fetch = FetchType.EAGER)  
 	@JoinColumn(name = "column_id")
@@ -27,4 +28,3 @@ public class BoardCard {
  
 	private Integer position;
 }
- 
