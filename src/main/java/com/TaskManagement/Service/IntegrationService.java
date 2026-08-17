@@ -17,7 +17,7 @@ public class IntegrationService {
 	@Autowired
 	private IssueClient issueClient;
 
-	public void handelCommitMessage(String msg, String author) {
+	public void handelCommitMessage(String msg, String author, Long organizationId) {
 
 		String regex = "([A-Z]+-\\d+)";
 		Matcher matcher = Pattern.compile(regex).matcher(msg);
@@ -30,7 +30,7 @@ public class IntegrationService {
 		}
 	}
 
-	public void handlePullingRequest(String title, String author) {
+	public void handlePullingRequest(String title, String author, Long organizationId) {
 
 		String regex = "([A-Z]+-\\d+)";
 		Matcher matcher = Pattern.compile(regex).matcher(title);
@@ -45,15 +45,15 @@ public class IntegrationService {
 		}
 	}
 
-	public void processGithubEvent(String event, Map<String, Object> payload) {
+	public void processGithubEvent(String event, Map<String, Object> payload, Long organizationId) {
 		if ("PUSH".equalsIgnoreCase(event))
-			handlePushCode(payload);
+			handlePushCode(payload, organizationId);
 		if ("PULL_REQUEST".equalsIgnoreCase(event))
-			handlePullRequest(payload);
+			handlePullRequest(payload, organizationId);
 	}
 
 	@SuppressWarnings("unchecked")
-	private void handlePushCode(Map<String, Object> payload) {
+	private void handlePushCode(Map<String, Object> payload, Long organizationId) {
 		Object commitObj = payload.get("commits");
 		if (!(commitObj instanceof List))
 			return;
@@ -65,22 +65,22 @@ public class IntegrationService {
 			String message = (String) commit.get("message");
 			Map<String, Object> authorMap = (Map<String, Object>) commit.get("author");
 			String author = authorMap != null ? (String) authorMap.get("name") : "Unknown";
-			handelCommitMessage(message, author);
+			handelCommitMessage(message, author, organizationId);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private void handlePullRequest(Map<String, Object> payload) {
+	private void handlePullRequest(Map<String, Object> payload, Long organizationId) {
 		Map<String, Object> pr = (Map<String, Object>) payload.get("pull_request");
 		if (pr == null)
 			return;
 		String title = (String) pr.get("title");
 		Map<String, Object> user = (Map<String, Object>) pr.get("user");
 		String author = user != null ? (String) user.get("login") : "unknown";
-		handlePullingRequest(title, author);
+		handlePullingRequest(title, author, organizationId);
 	}
 
-	public void processJenkinEvents(Map<String, Object> body) {
+	public void processJenkinEvents(Map<String, Object> body, Long organizationId) {
 		String jobName = (String) body.get("name");
 		String result = (String) body.get("result");
 		String log = (String) body.get("log");
@@ -101,7 +101,7 @@ public class IntegrationService {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void proceesDockerEvent(Map<String, Object> payload) {
+	public void proceesDockerEvent(Map<String, Object> payload, Long organizationId) {
 		String status = (String) payload.get("status");
 		String image = (String) payload.get("from");
 

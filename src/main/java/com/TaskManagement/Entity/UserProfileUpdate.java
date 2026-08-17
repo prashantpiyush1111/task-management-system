@@ -24,7 +24,7 @@ public class UserProfileUpdate {
 
 	private String department;
 	private String designation;
-	private String organizationName;
+	private Long organizationId;
 
 	private boolean active;
 
@@ -63,12 +63,12 @@ public class UserProfileUpdate {
 		this.designation = designation;
 	}
 
-	public String getOrganizationName() {
-		return organizationName;
+	public Long getOrganizationId() {
+		return organizationId;
 	}
 
-	public void setOrganizationName(String organizationName) {
-		this.organizationName = organizationName;
+	public void setOrganizationId(Long organizationId) {
+		this.organizationId = organizationId;
 	}
 
 	public LocalDateTime getCreatedAt() {

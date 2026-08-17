@@ -37,8 +37,9 @@ public class BoardService {
 		return boardRepo.save(board);
 	}
 
-	public Optional<Board> getByBoardId(Long id) {
-		return boardRepo.findById(id);
+	public Optional<Board> getByBoardId(Long id, Long organizationId) {
+		return boardRepo.findById(id)
+				.filter(b -> organizationId.equals(b.getOrganizationId()));
 	}
 
 	public List<BoardColumn> getBoardColumns(Long boardId) {
@@ -49,14 +50,19 @@ public class BoardService {
 		return boardCardRepo.findByBoardIdAndColumnIdOrderByPosition(boardId, columnId);
 	}
 
-	public Optional<Board> findById(Long id) {
-		return boardRepo.findById(id);
+	public Optional<Board> findById(Long id, Long organizationId) {
+		return boardRepo.findById(id)
+				.filter(b -> organizationId.equals(b.getOrganizationId()));
 	}
 
 	@Transactional
-	public BoardCard addIssueToBoard(Long boardId, Long columnId, Long issueId) {
+	public BoardCard addIssueToBoard(Long boardId, Long columnId, Long issueId, Long organizationId) {
 
-		issueRepo.findById(issueId).orElseThrow(() -> new RuntimeException("Issue not found"));
+		Issue issue = issueRepo.findById(issueId).orElseThrow(() -> new RuntimeException("Issue not found"));
+
+		if (!organizationId.equals(issue.getOrganizationId())) {
+			throw new RuntimeException("Issue not found");
+		}
 
 		boardCardRepo.findByIssueId(issueId).ifPresent(boardCardRepo::delete);
 
@@ -75,6 +81,7 @@ public class BoardService {
 
 		BoardCard card = new BoardCard();
 		card.setBoardId(boardId);
+		card.setOrganizationId(organizationId);
 		card.setColumn(column);
 		card.setIssueId(issueId);
 		card.setPosition(position);
@@ -83,9 +90,13 @@ public class BoardService {
 	}
 
 	@Transactional
-	public void moveCards(Long boardId, Long columnId, Long cardId, int position, String performedBy) {
+	public void moveCards(Long boardId, Long columnId, Long cardId, int position, String performedBy, Long organizationId) {
 
 		BoardCard card = boardCardRepo.findById(cardId).orElseThrow(() -> new RuntimeException("Card not found"));
+
+		if (!organizationId.equals(card.getOrganizationId())) {
+			throw new RuntimeException("Card not found");
+		}
 
 		BoardColumn fromColumn = card.getColumn();
 		BoardColumn toColumn = boardColumnRepo.findById(columnId)
@@ -134,10 +145,13 @@ public class BoardService {
 	}
 
 	@Transactional
-	public void recordColumn(Long boardId, Long columnId, List<Long> orderedByCardIds) {
+	public void recordColumn(Long boardId, Long columnId, List<Long> orderedByCardIds, Long organizationId) {
 		int position = 0;
 		for (Long cid : orderedByCardIds) {
 			BoardCard card = boardCardRepo.findById(cid).orElseThrow(() -> new RuntimeException("Card not found"));
+			if (!organizationId.equals(card.getOrganizationId())) {
+				throw new RuntimeException("Card not found");
+			}
 			card.setPosition(position++);
 			boardCardRepo.save(card);
 		}

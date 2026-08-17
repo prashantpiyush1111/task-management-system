@@ -21,23 +21,42 @@ public class SprintService {
 	@Autowired
 	private IssueRepository issueRepo;
 
-	public Sprint createSprint(Sprint sprint) {
+	public Sprint createSprint(Sprint sprint, Long organizationId) {
+		sprint.setOrganizationId(organizationId);
 		sprint.setSprintState(SprintState.PLANNED);
 		return sprintRepo.save(sprint);
 	}
 
-	public List<Sprint> getSprintsByProject(Long projectId) {
-		return sprintRepo.findByProjectId(projectId);
+	public List<Sprint> getSprintsByProject(Long projectId, Long organizationId) {
+		return sprintRepo.findByProjectId(projectId).stream()
+				.filter(s -> organizationId.equals(s.getOrganizationId()))
+				.toList();
 	}
 
-	public List<Sprint> getAllSprints() {
-		return sprintRepo.findAll();
+	public List<Sprint> getAllSprints(Long organizationId) {
+		return sprintRepo.findByOrganizationId(organizationId);
+	}
+
+	private Sprint getOwnedSprint(Long sprintId, Long organizationId) {
+		Sprint sprint = sprintRepo.findById(sprintId).orElseThrow(() -> new RuntimeException("Sprint not found"));
+		if (!organizationId.equals(sprint.getOrganizationId())) {
+			throw new RuntimeException("Sprint not found");
+		}
+		return sprint;
+	}
+
+	private Issue getOwnedIssue(Long issueId, Long organizationId) {
+		Issue issue = issueRepo.findById(issueId).orElseThrow(() -> new RuntimeException("Issue not found"));
+		if (!organizationId.equals(issue.getOrganizationId())) {
+			throw new RuntimeException("Issue not found");
+		}
+		return issue;
 	}
 
 	@Transactional
-	public Issue assignIssueToSprint(Long sprintId, Long issueId) {
-		Sprint sprint = sprintRepo.findById(sprintId).orElseThrow(() -> new RuntimeException("Sprint not found"));
-		Issue issue = issueRepo.findById(issueId).orElseThrow(() -> new RuntimeException("Issue not found"));
+	public Issue assignIssueToSprint(Long sprintId, Long issueId, Long organizationId) {
+		Sprint sprint = getOwnedSprint(sprintId, organizationId);
+		Issue issue = getOwnedIssue(issueId, organizationId);
 		if (sprint.getSprintState() == SprintState.COMPLETED) {
 			throw new RuntimeException("Cannot add task to completed sprint");
 		}
@@ -46,8 +65,8 @@ public class SprintService {
 	}
 
 	@Transactional
-	public Sprint startSprint(Long sprintId) {
-		Sprint sprint = sprintRepo.findById(sprintId).orElseThrow(() -> new RuntimeException("Sprint not found"));
+	public Sprint startSprint(Long sprintId, Long organizationId) {
+		Sprint sprint = getOwnedSprint(sprintId, organizationId);
 		if (sprint.getSprintState() != SprintState.PLANNED) {
 			throw new RuntimeException("Sprint cannot be started");
 		}
@@ -59,8 +78,8 @@ public class SprintService {
 	}
 
 	@Transactional
-	public Sprint endSprint(Long sprintId) {
-		Sprint sprint = sprintRepo.findById(sprintId).orElseThrow(() -> new RuntimeException("Sprint not found"));
+	public Sprint endSprint(Long sprintId, Long organizationId) {
+		Sprint sprint = getOwnedSprint(sprintId, organizationId);
 		sprint.setSprintState(SprintState.COMPLETED);
 		if (sprint.getEndDate() == null) {
 			sprint.setEndDate(LocalDate.now());
@@ -75,8 +94,8 @@ public class SprintService {
 		return sprintRepo.save(sprint);
 	}
 
-	public Map<String, Object> getBurnDownData(Long sprintId) {
-		Sprint sprint = sprintRepo.findById(sprintId).orElseThrow(() -> new RuntimeException("Sprint not found"));
+	public Map<String, Object> getBurnDownData(Long sprintId, Long organizationId) {
+		Sprint sprint = getOwnedSprint(sprintId, organizationId);
 		LocalDate start = sprint.getStartDate();
 		LocalDate end = sprint.getEndDate() != null ? sprint.getEndDate() : LocalDate.now();
 		List<Issue> issues = issueRepo.findBySprintId(sprintId);

@@ -67,19 +67,26 @@ public class SecurityConfig {
             )
 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/",
-                    "/*.html",
-                    "/css/**",
-                    "/js/**",
-                    "/images/**",
+            		.requestMatchers(
+            			    "/",
+            			    "/*.html",
+            			    "/favicon.ico",
+            			    "/css/**",
+            			    "/js/**",
+            			    "/images/**",
 
-                    "/api/user-auth/register",
-                    "/api/user-auth/login",
-                    "/api/user-auth/forgot-password",
-                    "/api/user-auth/reset-password"
-                )
-                .permitAll()
+            			    "/api/user-auth/register",
+            			    "/api/user-auth/login",
+            			    "/api/user-auth/forgot-password",
+            			    "/api/user-auth/reset-password",
+
+            			    "/api/organizations/register",
+            			    "/api/organizations"
+            			)
+            			.permitAll()
+
+                .requestMatchers("/api/admin/**")
+                .hasRole("ADMIN")
 
                 .anyRequest()
                 .authenticated()

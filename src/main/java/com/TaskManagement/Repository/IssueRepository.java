@@ -23,4 +23,6 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
 	List<Issue> findByIssueStatus(IssueStatus issueStatus);
 
 	List<Issue> findByProjectIdAndSprintIdIsNullOrderByBackLogPosition(Long projectId);
+
+	List<Issue> findByOrganizationId(Long organizationId);
 }

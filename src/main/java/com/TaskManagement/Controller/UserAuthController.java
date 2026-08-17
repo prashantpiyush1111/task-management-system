@@ -2,19 +2,16 @@ package com.TaskManagement.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-// Used to send HTTP responses
 import org.springframework.http.ResponseEntity;
 
-// Used for REST API mappings
 import org.springframework.web.bind.annotation.*;
 
-import com.TaskManagement.DTO.AuthResponseDTO; // DTO for authentication response
-import com.TaskManagement.DTO.RegisterRequestDTO; // DTO for register request
-import com.TaskManagement.DTO.LoginRequestDTO; // DTO for login request
-import com.TaskManagement.Service.UserAuthService; // Service layer for user authentication
+import com.TaskManagement.DTO.AuthResponseDTO;
+import com.TaskManagement.DTO.RegisterRequestDTO;
+import com.TaskManagement.DTO.LoginRequestDTO;
+import com.TaskManagement.Service.UserAuthService;
 
 @RestController
-
 @RequestMapping("/api/user-auth")
 public class UserAuthController {
 

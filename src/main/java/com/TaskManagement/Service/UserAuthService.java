@@ -11,8 +11,13 @@ import org.springframework.stereotype.Service;
 import com.TaskManagement.DTO.AuthResponseDTO;
 import com.TaskManagement.DTO.RegisterRequestDTO;
 import com.TaskManagement.DTO.LoginRequestDTO;
+import com.TaskManagement.Entity.Organization;
 import com.TaskManagement.Entity.UserAuth;
 import com.TaskManagement.Entity.UserProfileUpdate;
+import com.TaskManagement.Enum.OrganizationStatus;
+import com.TaskManagement.Enum.Role;
+import com.TaskManagement.Enum.UserStatus;
+import com.TaskManagement.Repository.OrganizationRepository;
 import com.TaskManagement.Repository.UserAuthRepository;
 import com.TaskManagement.Repository.UserProfileUpdateRepository;
 import com.TaskManagement.Security.EmailService;
@@ -23,6 +28,9 @@ public class UserAuthService {
 
 	@Autowired
 	private UserAuthRepository userAuthRepo;
+
+	@Autowired
+	private OrganizationRepository organizationRepo;
 
 	@Autowired
 	private UserProfileUpdateRepository userProfileUpdateRepo;
@@ -45,25 +53,41 @@ public class UserAuthService {
 			throw new RuntimeException("User already exists");
 		}
 
+		Organization organization = organizationRepo
+				.findById(register.getOrganizationId())
+				.orElseThrow(() -> new RuntimeException("Organization not found"));
+
+		if (organization.getStatus() != OrganizationStatus.ACTIVE) {
+			throw new RuntimeException("Organization is not active");
+		}
+
+		// ADMIN accounts are only created via organization creation
+		// (first-admin bootstrap) — never through open self-registration.
+		if (register.getRole() == Role.ADMIN) {
+			throw new RuntimeException("Cannot self-register as ADMIN");
+		}
+
 		UserAuth user = new UserAuth();
 		user.setUserName(register.getUserName());
 		user.setUserOfficialEmail(register.getUserOfficialEmail());
 		user.setPassword(passwordEncoder.encode(register.getPassword()));
 		user.setRole(register.getRole());
+		user.setOrganization(organization);
+		user.setStatus(UserStatus.PENDING);
 
 		userAuthRepo.save(user);
 
 		// Create default profile for the newly registered user
 		UserProfileUpdate profile = UserProfileUpdate.builder()
-				.userOfficialEmail(user.getUserOfficialEmail())
-				.active(true)
-				.build();
+		        .userOfficialEmail(user.getUserOfficialEmail())
+		        .organizationId(organization.getId())
+		        .active(true)
+		        .build();
 
 		userProfileUpdateRepo.save(profile);
 
-		String token = jwtUtil.generateToken(user);
-
-		return new AuthResponseDTO(token, "User Registered Successfully");
+		// No token issued yet — account is PENDING until an organization admin approves it.
+		return new AuthResponseDTO(null, "Registration successful. Awaiting admin approval.");
 	}
 
 	public AuthResponseDTO login(LoginRequestDTO login) {
@@ -74,6 +98,14 @@ public class UserAuthService {
 
 		if (!passwordEncoder.matches(login.getPassword(), user.getPassword())) {
 			throw new RuntimeException("Invalid credentials");
+		}
+
+		if (user.getStatus() == UserStatus.PENDING) {
+			throw new RuntimeException("Your account is awaiting admin approval");
+		}
+
+		if (user.getStatus() == UserStatus.REJECTED) {
+			throw new RuntimeException("Your registration was rejected. Contact your organization admin");
 		}
 
 		String token = jwtUtil.generateToken(user);

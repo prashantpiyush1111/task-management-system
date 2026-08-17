@@ -10,5 +10,6 @@ import com.TaskManagement.Entity.Sprint;
 @Repository
 public interface SprintRepository extends JpaRepository<Sprint, Long> {
 	List<Sprint> findByProjectId(Long projectId);
+	List<Sprint> findByOrganizationId(Long organizationId);
 
 }

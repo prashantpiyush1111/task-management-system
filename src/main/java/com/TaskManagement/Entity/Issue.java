@@ -1,16 +1,12 @@
 package com.TaskManagement.Entity;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-
 import com.TaskManagement.Enum.IssuePriority;
 import com.TaskManagement.Enum.IssueStatus;
 import com.TaskManagement.Enum.IssueType;
-
 import jakarta.persistence.*;
 import lombok.Data;
-
 @Data
 @Entity
 @Table(name = "issues", indexes = { @Index(name = "idx_issue_key", columnList = "issueKey"),
@@ -38,6 +34,8 @@ public class Issue {
 	private Long epicId;
 	private Long parentIssueId;
 	private Integer backLogPosition;
+	@Column(nullable = false)
+	private Long organizationId;
 	private LocalDateTime createdAt = LocalDateTime.now();
 	private LocalDateTime updatedAt = LocalDateTime.now();
 	private LocalDateTime dueDate;

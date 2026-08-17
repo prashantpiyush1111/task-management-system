@@ -40,9 +40,10 @@ public class IssueService {
 	}
 
 	@Transactional
-	public IssueDTO createIssue(IssueDTO dto) {
+	public IssueDTO createIssue(IssueDTO dto, Long organizationId) {
 
 		Issue issue = new Issue();
+		issue.setOrganizationId(organizationId);
 		issue.setIssueTitle(dto.getIssueTitle());
 		issue.setIssueDescription(dto.getIssueDescription());
 		issue.setIssueType(dto.getIssueType() != null ? dto.getIssueType() : IssueType.TASK);
@@ -65,6 +66,7 @@ public class IssueService {
 				Label label = labelRepo.findByName(name).orElseGet(() -> {
 					Label l = new Label();
 					l.setName(name);
+					l.setOrganizationId(organizationId);
 					return labelRepo.save(l);
 				});
 				labels.add(label);
@@ -78,10 +80,18 @@ public class IssueService {
 		return toDTO(issue);
 	}
 
-	@Transactional
-	public IssueComment addComment(Long issueId, String authorEmail, String body) {
+	private Issue getOwnedIssue(Long id, Long organizationId) {
+		Issue issue = issueRepo.findById(id).orElseThrow(() -> new RuntimeException("Issue not found"));
+		if (!organizationId.equals(issue.getOrganizationId())) {
+			throw new RuntimeException("Issue not found");
+		}
+		return issue;
+	}
 
-		Issue issue = issueRepo.findById(issueId).orElseThrow(() -> new RuntimeException("Issue not found"));
+	@Transactional
+	public IssueComment addComment(Long issueId, String authorEmail, String body, Long organizationId) {
+
+		Issue issue = getOwnedIssue(issueId, organizationId);
 
 		IssueComment comment = IssueComment.builder().issueId(issue.getId()).authorEmail(authorEmail).body(body)
 				.build();
@@ -90,9 +100,9 @@ public class IssueService {
 	}
 
 	@Transactional
-	public IssueDTO updateIssueStatus(Long id, IssueStatus status, String performedBy) {
+	public IssueDTO updateIssueStatus(Long id, IssueStatus status, String performedBy, Long organizationId) {
 
-		Issue issue = issueRepo.findById(id).orElseThrow(() -> new RuntimeException("Issue not found"));
+		Issue issue = getOwnedIssue(id, organizationId);
 
 		if (status == null) {
 			throw new RuntimeException("Status cannot be null");
@@ -104,34 +114,44 @@ public class IssueService {
 		return toDTO(issue);
 	}
 
-	public List<IssueDTO> search(Map<String, String> filters) {
+	public List<IssueDTO> search(Map<String, String> filters, Long organizationId) {
 
 		if (filters.containsKey("assignee")) {
-			return issueRepo.findByAssigneeEmail(filters.get("assignee")).stream().map(this::toDTO)
+			return issueRepo.findByAssigneeEmail(filters.get("assignee")).stream()
+					.filter(i -> organizationId.equals(i.getOrganizationId()))
+					.map(this::toDTO)
 					.collect(Collectors.toList());
 		}
 		if (filters.containsKey("sprint")) {
-			return issueRepo.findBySprintId(Long.valueOf(filters.get("sprint"))).stream().map(this::toDTO)
+			return issueRepo.findBySprintId(Long.valueOf(filters.get("sprint"))).stream()
+					.filter(i -> organizationId.equals(i.getOrganizationId()))
+					.map(this::toDTO)
 					.collect(Collectors.toList());
 		}
 		if (filters.containsKey("status")) {
 			IssueStatus status = IssueStatus.valueOf(filters.get("status").toUpperCase());
-			return issueRepo.findByIssueStatus(status).stream().map(this::toDTO).collect(Collectors.toList());
+			return issueRepo.findByIssueStatus(status).stream()
+					.filter(i -> organizationId.equals(i.getOrganizationId()))
+					.map(this::toDTO)
+					.collect(Collectors.toList());
 		}
-		return issueRepo.findAll().stream().map(this::toDTO).collect(Collectors.toList());
+		return issueRepo.findByOrganizationId(organizationId).stream().map(this::toDTO).collect(Collectors.toList());
 	}
 
-	public Sprint createSprint(Sprint sprint) {
+	public Sprint createSprint(Sprint sprint, Long organizationId) {
+		sprint.setOrganizationId(organizationId);
 		return sprintRepo.save(sprint);
 	}
 
-	public IssueDTO getById(Long id) {
-		Issue issue = issueRepo.findById(id).orElseThrow(() -> new RuntimeException("Issue not found"));
+	public IssueDTO getById(Long id, Long organizationId) {
+		Issue issue = getOwnedIssue(id, organizationId);
 		return toDTO(issue);
 	}
 
-	public List<IssueDTO> getByAssigneeEmail(String email) {
-		return issueRepo.findByAssigneeEmail(email).stream().map(this::toDTO).collect(Collectors.toList());
+	public List<IssueDTO> getByAssigneeEmail(String email, Long organizationId) {
+		return issueRepo.findByAssigneeEmail(email).stream()
+				.filter(i -> organizationId.equals(i.getOrganizationId()))
+				.map(this::toDTO).collect(Collectors.toList());
 	}
 
 	private IssueDTO toDTO(Issue issue) {

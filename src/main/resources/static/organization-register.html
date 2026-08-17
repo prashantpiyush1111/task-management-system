@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WorkFlow — Register Organization</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0b0f;--surface:#111318;--card:#161a22;--border:#1e2330;
+  --accent:#4f7cff;--accent2:#7c5cfc;--success:#22c55e;--danger:#ef4444;
+  --text:#e8eaf0;--muted:#6b7280;
+}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;overflow:hidden}
+/* LEFT */
+.left{width:55%;position:relative;background:linear-gradient(135deg,#0d1117,#0f172a,#0d1117);display:flex;flex-direction:column;justify-content:center;padding:80px;overflow:hidden}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(79,124,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(79,124,255,.04) 1px,transparent 1px);background-size:40px 40px}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.15}
+.orb1{width:400px;height:400px;background:#4f7cff;top:-100px;left:-100px;animation:float 8s ease-in-out infinite}
+.orb2{width:300px;height:300px;background:#7c5cfc;bottom:50px;right:80px;animation:float 10s ease-in-out infinite reverse}
+.orb3{width:200px;height:200px;background:#22c55e;top:50%;left:40%;animation:float 12s ease-in-out infinite 2s}
+@keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.05)}}
+.brand{position:relative;z-index:1;display:flex;align-items:center;gap:12px;margin-bottom:56px}
+.logo-box{width:48px;height:48px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.brand-name{font-size:26px;font-weight:700;letter-spacing:-.5px}.brand-name span{color:var(--accent)}
+.hero{position:relative;z-index:1}
+.hero h1{font-size:50px;font-weight:700;line-height:1.1;letter-spacing:-2px;margin-bottom:18px}
+.hero h1 .hl{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--muted);font-size:16px;line-height:1.7;max-width:420px;margin-bottom:48px}
+.features{position:relative;z-index:1;display:flex;flex-direction:column;gap:14px}
+.feat{display:flex;align-items:center;gap:12px;color:#9ca3af;font-size:14px}
+.dot{width:8px;height:8px;background:var(--accent);border-radius:50%;flex-shrink:0;box-shadow:0 0 8px var(--accent)}
+/* RIGHT */
+.right{width:45%;display:flex;align-items:center;justify-content:center;padding:60px 48px;background:var(--surface);border-left:1px solid var(--border);overflow-y:auto}
+.auth-box{width:100%;max-width:400px;padding:24px 0}
+.form-title{font-size:26px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px}
+.form-sub{color:var(--muted);font-size:14px;margin-bottom:28px}
+.section-label{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin:22px 0 14px;display:flex;align-items:center;gap:8px}
+.section-label:first-of-type{margin-top:0}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.fg{margin-bottom:18px}
+label{display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:7px;text-transform:uppercase;letter-spacing:.8px}
+.iw{position:relative}
+.iw .ic{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;pointer-events:none}
+input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px 12px 40px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,124,255,.12)}
+.hint{font-size:12px;color:var(--muted);margin-top:6px}
+.btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s,transform .1s;margin-top:8px;letter-spacing:.2px}
+.btn:hover{opacity:.9;transform:translateY(-1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.alert{padding:11px 14px;border-radius:8px;font-size:13px;margin-bottom:18px;display:none}
+.alert.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171}
+.alert.ok{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#4ade80}
+.alert.show{display:block;animation:slidein .25s ease}
+@keyframes slidein{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.back-link{display:block;text-align:center;margin-top:22px;color:var(--muted);font-size:13px;text-decoration:none}
+.back-link a{color:var(--accent);text-decoration:none}
+.back-link a:hover{text-decoration:underline}
+@media(max-width:768px){.left{display:none}.right{width:100%}}
+</style>
+</head>
+<body>
+
+<div class="left">
+  <div class="grid-bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <div class="brand">
+    <div class="logo-box">⚡</div>
+    <div class="brand-name">Work<span>Flow</span></div>
+  </div>
+  <div class="hero">
+    <h1>Bring Your Team<br><span class="hl">On Board.</span></h1>
+    <p>Set up your organization's workspace in seconds. You'll be the first admin — invite teammates and approve access as they join.</p>
+  </div>
+  <div class="features">
+    <div class="feat"><div class="dot"></div>Your own isolated workspace</div>
+    <div class="feat"><div class="dot"></div>Approve every teammate who joins</div>
+    <div class="feat"><div class="dot"></div>Full admin control from day one</div>
+    <div class="feat"><div class="dot"></div>No credit card required</div>
+  </div>
+</div>
+
+<div class="right">
+  <div class="auth-box">
+    <div class="form-title">Register your organization</div>
+    <div class="form-sub">Create a workspace and become its first admin</div>
+
+    <div class="alert err" id="alertBox"></div>
+
+    <div class="section-label">Organization Details</div>
+    <div class="fg">
+      <label>Organization Name</label>
+      <div class="iw"><span class="ic">🏢</span>
+        <input type="text" id="orgName" placeholder="Acme Inc."/>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Organization Email</label>
+      <div class="iw"><span class="ic">✉</span>
+        <input type="email" id="orgEmail" placeholder="contact@acme.com"/>
+      </div>
+    </div>
+
+    <div class="section-label">First Admin Account</div>
+    <div class="fg">
+      <label>Admin Full Name</label>
+      <div class="iw"><span class="ic">👤</span>
+        <input type="text" id="adminName" placeholder="Your full name"/>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Admin Email</label>
+      <div class="iw"><span class="ic">✉</span>
+        <input type="email" id="adminEmail" placeholder="you@acme.com"/>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Admin Password</label>
+      <div class="iw"><span class="ic">🔒</span>
+        <input type="password" id="adminPassword" placeholder="Min 8 characters"/>
+      </div>
+      <div class="hint">You'll use this to sign in as admin.</div>
+    </div>
+
+    <button class="btn" id="registerBtn" onclick="doRegisterOrg()">Create Organization</button>
+
+    <div class="back-link">Already have a workspace? <a href="login.html">Sign in here</a></div>
+  </div>
+</div>
+
+<script>
+const API = window.location.origin;
+
+function showAlert(msg, type='err') {
+  const el = document.getElementById('alertBox');
+  el.textContent = msg;
+  el.className = 'alert ' + type + ' show';
+}
+function hideAlert() {
+  const el = document.getElementById('alertBox');
+  el.className = 'alert err';
+}
+
+function setLoading(loading) {
+  const btn = document.getElementById('registerBtn');
+  btn.disabled = loading;
+  btn.innerHTML = loading ? `<span class="spin"></span>Creating workspace...` : 'Create Organization';
+}
+
+async function doRegisterOrg() {
+  hideAlert();
+
+  const organizationName = document.getElementById('orgName').value.trim();
+  const organizationEmail = document.getElementById('orgEmail').value.trim();
+  const adminUserName = document.getElementById('adminName').value.trim();
+  const adminEmail = document.getElementById('adminEmail').value.trim();
+  const adminPassword = document.getElementById('adminPassword').value;
+
+  if (!organizationName || !organizationEmail || !adminUserName || !adminEmail || !adminPassword) {
+    showAlert('Please fill all fields');
+    return;
+  }
+  if (adminPassword.length < 8) {
+    showAlert('Password must be at least 8 characters');
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const res = await fetch(API + '/api/organizations/register', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ organizationName, organizationEmail, adminUserName, adminEmail, adminPassword })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || data.error || 'Registration failed');
+
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('userEmail', adminEmail);
+
+    showAlert('Organization created! Redirecting to your dashboard...', 'ok');
+    setTimeout(() => window.location.href = 'dashboard.html', 1200);
+  } catch(e) {
+    showAlert(e.message);
+  } finally {
+    setLoading(false);
+  }
+}
+
+// Redirect if already logged in
+if (localStorage.getItem('token')) window.location.href = 'dashboard.html';
+</script>
+</body>
+</html>

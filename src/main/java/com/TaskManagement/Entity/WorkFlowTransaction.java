@@ -1,5 +1,4 @@
 package com.TaskManagement.Entity;
-
 import java.util.HashSet;
 import java.util.Set;
 import com.TaskManagement.Enum.IssueStatus;
@@ -7,7 +6,6 @@ import com.TaskManagement.Enum.Role;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
-
 @Entity
 @Table(name = "workFlow_Transactions")
 @Data
@@ -27,5 +25,4 @@ public class WorkFlowTransaction {
 	@JoinColumn(name = "workflow_id")
 	@JsonBackReference
 	private WorkFlow workFlow;
-
 }

@@ -26,9 +26,17 @@ public class ReportService {
 	@Autowired
 	private SprintRepository sprintRepo;
 
-	public Map<String, Object> burnDownData(Long sprintId) {
-
+	private Sprint getOwnedSprint(Long sprintId, Long organizationId) {
 		Sprint sprint = sprintRepo.findById(sprintId).orElseThrow(() -> new RuntimeException("Sprint not found"));
+		if (!organizationId.equals(sprint.getOrganizationId())) {
+			throw new RuntimeException("Sprint not found");
+		}
+		return sprint;
+	}
+
+	public Map<String, Object> burnDownData(Long sprintId, Long organizationId) {
+
+		Sprint sprint = getOwnedSprint(sprintId, organizationId);
 
 		List<Issue> issues = issueRepo.findBySprintId(sprintId);
 		int total = issues.size();
@@ -49,10 +57,10 @@ public class ReportService {
 		return result;
 	}
 
-	public Map<String, Object> velocity(Long projectId) {
+	public Map<String, Object> velocity(Long projectId, Long organizationId) {
 
 		List<Sprint> completed = sprintRepo.findByProjectId(projectId).stream()
-				// FIX: SprintState.COMPLETE -> SprintState.COMPLETED
+				.filter(s -> organizationId.equals(s.getOrganizationId()))
 				.filter(s -> s.getState() == SprintState.COMPLETED).collect(Collectors.toList());
 
 		Map<String, Integer> velocity = new LinkedHashMap<>();
@@ -68,7 +76,9 @@ public class ReportService {
 		return result;
 	}
 
-	public Map<String, Object> sprintReport(Long sprintId) {
+	public Map<String, Object> sprintReport(Long sprintId, Long organizationId) {
+
+		getOwnedSprint(sprintId, organizationId);
 
 		List<Issue> issues = issueRepo.findBySprintId(sprintId);
 
@@ -82,13 +92,15 @@ public class ReportService {
 		return result;
 	}
 
-	public Map<String, Object> epicProgessReport(Long epicId) {
-		return epicProgressReport(epicId);
+	public Map<String, Object> epicProgessReport(Long epicId, Long organizationId) {
+		return epicProgressReport(epicId, organizationId);
 	}
 
-	public Map<String, Object> epicProgressReport(Long epicId) {
+	public Map<String, Object> epicProgressReport(Long epicId, Long organizationId) {
 
-		List<Issue> stories = issueRepo.findByEpicId(epicId);
+		List<Issue> stories = issueRepo.findByEpicId(epicId).stream()
+				.filter(i -> organizationId.equals(i.getOrganizationId()))
+				.collect(Collectors.toList());
 		long done = stories.stream().filter(i -> i.getIssueStatus() == IssueStatus.DONE).count();
 
 		Map<String, Object> result = new HashMap<>();
@@ -99,7 +111,9 @@ public class ReportService {
 		return result;
 	}
 
-	public Map<String, Object> cumulativeFlow(Long sprintId) {
+	public Map<String, Object> cumulativeFlow(Long sprintId, Long organizationId) {
+
+		getOwnedSprint(sprintId, organizationId);
 
 		List<Issue> issues = issueRepo.findBySprintId(sprintId);
 
@@ -111,7 +125,9 @@ public class ReportService {
 		return result;
 	}
 
-	public Map<String, Object> workLodDistribution(Long sprintId) {
+	public Map<String, Object> workLodDistribution(Long sprintId, Long organizationId) {
+
+		getOwnedSprint(sprintId, organizationId);
 
 		List<Issue> issues = issueRepo.findBySprintId(sprintId);
 
