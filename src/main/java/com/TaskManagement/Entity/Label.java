@@ -19,8 +19,10 @@ public class Label {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(unique = true, nullable = false)
+	@Column(nullable = false)
 	private String name;
+
+	private Long organizationId;
 
 	public Long getId() {
 		return id;
@@ -36,6 +38,14 @@ public class Label {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Long getOrganizationId() {
+		return organizationId;
+	}
+
+	public void setOrganizationId(Long organizationId) {
+		this.organizationId = organizationId;
 	}
 
 }
