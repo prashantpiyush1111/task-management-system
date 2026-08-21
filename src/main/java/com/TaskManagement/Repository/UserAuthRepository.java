@@ -18,4 +18,5 @@ public interface UserAuthRepository extends JpaRepository<UserAuth, Long> {
 	List<UserAuth> findByOrganizationIdAndStatus(Long organizationId, UserStatus status);
 
 	Optional<UserAuth> findByIdAndOrganizationId(Long id, Long organizationId);
+	List<UserAuth> findByOrganizationId(Long organizationId);
 }

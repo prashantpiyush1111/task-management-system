@@ -107,6 +107,9 @@ public class UserAuthService {
 		if (user.getStatus() == UserStatus.REJECTED) {
 			throw new RuntimeException("Your registration was rejected. Contact your organization admin");
 		}
+		if (user.getStatus() == UserStatus.INACTIVE) {
+		    throw new RuntimeException("Your account has been deactivated. Contact your organization admin");
+		}
 
 		String token = jwtUtil.generateToken(user);
 

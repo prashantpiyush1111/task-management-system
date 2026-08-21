@@ -1,342 +1,1775 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
 <title>WorkFlow — Team Management</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0a0b0f;--surface:#111318;--card:#161a22;--card2:#1c2130;--border:#1e2330;--accent:#4f7cff;--accent2:#7c5cfc;--success:#22c55e;--warning:#f59e0b;--danger:#ef4444;--info:#38bdf8;--text:#e8eaf0;--muted:#6b7280;--subtle:#374151}
-body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
-::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 0;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform .25s ease}
-.sl{display:flex;align-items:center;gap:9px;padding:0 16px 20px;border-bottom:1px solid var(--border);margin-bottom:12px}
-.li{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.lt{font-size:17px;font-weight:700}.lt span{color:var(--accent)}
-.close-sidebar{display:none;margin-left:auto;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px}
-.ns{padding:0 10px;margin-top:8px;overflow-y:auto}
-.nl{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:0 8px;margin:12px 0 4px}
-.ni{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:500;transition:all .15s;cursor:pointer;position:relative}
-.ni:hover{background:var(--card);color:var(--text)}
-.ni.active{background:rgba(79,124,255,.1);color:var(--accent)}
-.ni.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--accent);border-radius:2px}
-.nico{font-size:15px;width:18px;text-align:center}
-.nbadge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px}
-.nbadge.warn{background:var(--warning)}
-.sf{margin-top:auto;padding:12px 10px 0;border-top:1px solid var(--border)}
-.uc{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;cursor:pointer;transition:background .15s;overflow:hidden}
-.uc:hover{background:var(--card)}
-.av{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
-.un{font-size:11px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px}
-.ur{font-size:11px;color:var(--muted)}
-.logout-btn{width:100%;margin-top:6px;padding:9px;background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;text-align:left;display:flex;align-items:center;gap:8px}
-.logout-btn:hover{border-color:var(--danger);color:var(--danger)}
 
-.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:90;opacity:0;transition:opacity .2s}
-.sidebar-overlay.show{display:block;opacity:1}
+*,*::before,*::after{
+  box-sizing:border-box;
+  margin:0;
+  padding:0
+}
 
-.main{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh;min-width:0}
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;gap:12px}
-.tb-left{display:flex;align-items:center;gap:12px;min-width:0}
-.menu-toggle{display:none;background:var(--card);border:1px solid var(--border);border-radius:8px;width:34px;height:34px;color:var(--text);font-size:16px;cursor:pointer;flex-shrink:0;align-items:center;justify-content:center}
-.page-title{font-size:18px;font-weight:700;letter-spacing:-.3px;white-space:nowrap}
-.tb-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.tb-btn{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 14px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;text-decoration:none;white-space:nowrap}
-.tb-btn:hover{border-color:var(--accent);color:var(--accent)}
-.tb-btn-label{display:inline}
-.content{padding:28px;flex:1;min-width:0}
-.gate{display:none;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:18px 22px;margin-bottom:24px;color:#f87171;font-size:14px}
-.gate.show{display:block}
-.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:12px;flex-wrap:wrap}
-.tabs{display:flex;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:4px;gap:4px}
-.tab{padding:8px 16px;border:none;background:transparent;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;border-radius:7px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;white-space:nowrap}
-.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
-.tab .cnt{background:rgba(255,255,255,.15);padding:1px 7px;border-radius:20px;font-size:11px}
-.tab:not(.active) .cnt{background:var(--subtle);color:#d1d5db}
-.search{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:9px 14px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;width:220px}
-.search:focus{border-color:var(--accent)}
-.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.table-scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
-table{width:100%;border-collapse:collapse;min-width:560px}
-thead th{text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);padding:14px 20px;border-bottom:1px solid var(--border);background:var(--card2);white-space:nowrap}
-tbody td{padding:14px 20px;border-bottom:1px solid var(--border);font-size:13.5px;vertical-align:middle}
-tbody tr:last-child td{border-bottom:none}
-tbody tr:hover{background:var(--card2)}
-.person{display:flex;align-items:center;gap:12px}
-.p-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
-.p-name{font-weight:600;font-size:13.5px;white-space:nowrap}
-.p-email{font-size:12px;color:var(--muted);white-space:nowrap}
-.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
-.badge.role{background:rgba(79,124,255,.15);color:#93bbff}
-.badge.status-pending{background:rgba(245,158,11,.15);color:#fbbf24}
-.badge.status-active{background:rgba(34,197,94,.15);color:#4ade80}
-.badge.status-rejected{background:rgba(239,68,68,.15);color:#f87171}
-.actions{display:flex;gap:8px}
-.abtn{padding:7px 14px;border-radius:7px;font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .2s;border:1px solid var(--border);display:flex;align-items:center;gap:5px;white-space:nowrap}
-.abtn.approve{background:rgba(34,197,94,.12);color:#4ade80;border-color:rgba(34,197,94,.3)}
-.abtn.approve:hover{background:rgba(34,197,94,.22)}
-.abtn.reject{background:rgba(239,68,68,.1);color:#f87171;border-color:rgba(239,68,68,.3)}
-.abtn.reject:hover{background:rgba(239,68,68,.2)}
-.abtn:disabled{opacity:.5;cursor:not-allowed}
-.empty{color:var(--muted);font-size:13.5px;text-align:center;padding:60px 20px}
-.empty .ic{font-size:34px;margin-bottom:10px;display:block}
-.toast{position:fixed;bottom:24px;right:24px;left:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:13px 18px;font-size:13.5px;box-shadow:0 8px 24px rgba(0,0,0,.4);display:none;align-items:center;gap:10px;z-index:300;max-width:320px;margin:0 0 0 auto}
-.toast.show{display:flex;animation:slidein .25s ease}
-.toast.ok{border-color:rgba(34,197,94,.4);color:#4ade80}
-.toast.err{border-color:rgba(239,68,68,.4);color:#f87171}
-@keyframes slidein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.25);border-top-color:currentColor;border-radius:50%;animation:spin .6s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+:root{
+  --bg:#0a0b0f;
+  --surface:#111318;
+  --card:#161a22;
+  --card2:#1c2130;
+  --border:#1e2330;
+  --accent:#4f7cff;
+  --accent2:#7c5cfc;
+  --success:#22c55e;
+  --warning:#f59e0b;
+  --danger:#ef4444;
+  --info:#38bdf8;
+  --text:#e8eaf0;
+  --muted:#6b7280;
+  --subtle:#374151
+}
+
+body{
+  font-family:'Space Grotesk',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  display:flex;
+  min-height:100vh
+}
+
+::-webkit-scrollbar{
+  width:5px;
+  height:5px
+}
+
+::-webkit-scrollbar-track{
+  background:var(--bg)
+}
+
+::-webkit-scrollbar-thumb{
+  background:var(--border);
+  border-radius:3px
+}
+
+.sidebar{
+  width:220px;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  padding:20px 0;
+  position:fixed;
+  top:0;
+  left:0;
+  bottom:0;
+  z-index:100;
+  transition:transform .25s ease
+}
+
+.sl{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:0 16px 20px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:12px
+}
+
+.li{
+  width:34px;
+  height:34px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:9px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+  flex-shrink:0
+}
+
+.lt{
+  font-size:17px;
+  font-weight:700
+}
+
+.lt span{
+  color:var(--accent)
+}
+
+.close-sidebar{
+  display:none;
+  margin-left:auto;
+  background:none;
+  border:none;
+  color:var(--muted);
+  font-size:18px;
+  cursor:pointer;
+  padding:4px
+}
+
+.ns{
+  padding:0 10px;
+  margin-top:8px;
+  overflow-y:auto
+}
+
+.nl{
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:var(--muted);
+  padding:0 8px;
+  margin:12px 0 4px
+}
+
+.ni{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:9px 10px;
+  border-radius:7px;
+  color:var(--muted);
+  text-decoration:none;
+  font-size:13.5px;
+  font-weight:500;
+  transition:all .15s;
+  cursor:pointer;
+  position:relative
+}
+
+.ni:hover{
+  background:var(--card);
+  color:var(--text)
+}
+
+.ni.active{
+  background:rgba(79,124,255,.1);
+  color:var(--accent)
+}
+
+.ni.active::before{
+  content:'';
+  position:absolute;
+  left:0;
+  top:20%;
+  bottom:20%;
+  width:3px;
+  background:var(--accent);
+  border-radius:2px
+}
+
+.nico{
+  font-size:15px;
+  width:18px;
+  text-align:center
+}
+
+.nbadge{
+  margin-left:auto;
+  background:var(--accent);
+  color:#fff;
+  font-size:10px;
+  font-weight:700;
+  padding:1px 6px;
+  border-radius:20px
+}
+
+.nbadge.warn{
+  background:var(--warning)
+}
+
+.sf{
+  margin-top:auto;
+  padding:12px 10px 0;
+  border-top:1px solid var(--border)
+}
+
+.uc{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:9px 10px;
+  border-radius:7px;
+  cursor:pointer;
+  transition:background .15s;
+  overflow:hidden
+}
+
+.uc:hover{
+  background:var(--card)
+}
+
+.av{
+  width:30px;
+  height:30px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:13px;
+  font-weight:700;
+  flex-shrink:0
+}
+
+.un{
+  font-size:11px;
+  font-weight:500;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  max-width:140px
+}
+
+.ur{
+  font-size:11px;
+  color:var(--muted)
+}
+
+.logout-btn{
+  width:100%;
+  margin-top:6px;
+  padding:9px;
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:7px;
+  color:var(--muted);
+  font-family:'Space Grotesk',sans-serif;
+  font-size:13px;
+  cursor:pointer;
+  transition:all .2s;
+  text-align:left;
+  display:flex;
+  align-items:center;
+  gap:8px
+}
+
+.logout-btn:hover{
+  border-color:var(--danger);
+  color:var(--danger)
+}
+
+.sidebar-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  z-index:90;
+  opacity:0;
+  transition:opacity .2s
+}
+
+.sidebar-overlay.show{
+  display:block;
+  opacity:1
+}
+
+.main{
+  margin-left:220px;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+  min-width:0
+}
+
+.topbar{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:0 28px;
+  height:58px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  z-index:40;
+  gap:12px
+}
+
+.tb-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0
+}
+
+.menu-toggle{
+  display:none;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  width:34px;
+  height:34px;
+  color:var(--text);
+  font-size:16px;
+  cursor:pointer;
+  flex-shrink:0;
+  align-items:center;
+  justify-content:center
+}
+
+.page-title{
+  font-size:18px;
+  font-weight:700;
+  letter-spacing:-.3px;
+  white-space:nowrap
+}
+
+.tb-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-shrink:0
+}
+
+.tb-btn{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:7px 14px;
+  color:var(--text);
+  font-family:'Space Grotesk',sans-serif;
+  font-size:13px;
+  cursor:pointer;
+  transition:all .2s;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  text-decoration:none;
+  white-space:nowrap
+}
+
+.tb-btn:hover{
+  border-color:var(--accent);
+  color:var(--accent)
+}
+
+.tb-btn-label{
+  display:inline
+}
+
+.content{
+  padding:28px;
+  flex:1;
+  min-width:0
+}
+
+.gate{
+  display:none;
+  background:rgba(239,68,68,.08);
+  border:1px solid rgba(239,68,68,.3);
+  border-radius:12px;
+  padding:18px 22px;
+  margin-bottom:24px;
+  color:#f87171;
+  font-size:14px
+}
+
+.gate.show{
+  display:block
+}
+
+.toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:18px;
+  gap:12px;
+  flex-wrap:wrap
+}
+
+.tabs{
+  display:flex;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:4px;
+  gap:4px
+}
+
+.tab{
+  padding:8px 16px;
+  border:none;
+  background:transparent;
+  color:var(--muted);
+  font-family:'Space Grotesk',sans-serif;
+  font-size:13px;
+  font-weight:600;
+  border-radius:7px;
+  cursor:pointer;
+  transition:all .2s;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  white-space:nowrap
+}
+
+.tab.active{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff
+}
+
+.tab .cnt{
+  background:rgba(255,255,255,.15);
+  padding:1px 7px;
+  border-radius:20px;
+  font-size:11px
+}
+
+.tab:not(.active) .cnt{
+  background:var(--subtle);
+  color:#d1d5db
+}
+
+.search{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:9px;
+  padding:9px 14px;
+  color:var(--text);
+  font-family:'Space Grotesk',sans-serif;
+  font-size:13px;
+  outline:none;
+  width:220px
+}
+
+.search:focus{
+  border-color:var(--accent)
+}
+
+.panel{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden
+}
+
+.table-scroll{
+  width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:560px
+}
+
+thead th{
+  text-align:left;
+  font-size:11px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.6px;
+  color:var(--muted);
+  padding:14px 20px;
+  border-bottom:1px solid var(--border);
+  background:var(--card2);
+  white-space:nowrap
+}
+
+tbody td{
+  padding:14px 20px;
+  border-bottom:1px solid var(--border);
+  font-size:13.5px;
+  vertical-align:middle
+}
+
+tbody tr:last-child td{
+  border-bottom:none
+}
+
+tbody tr:hover{
+  background:var(--card2)
+}
+
+.person{
+  display:flex;
+  align-items:center;
+  gap:12px
+}
+
+.p-av{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  font-weight:700;
+  flex-shrink:0
+}
+
+.p-name{
+  font-weight:600;
+  font-size:13.5px;
+  white-space:nowrap
+}
+
+.p-email{
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  padding:3px 10px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  white-space:nowrap
+}
+
+.badge.role{
+  background:rgba(79,124,255,.15);
+  color:#93bbff
+}
+
+.badge.status-pending{
+  background:rgba(245,158,11,.15);
+  color:#fbbf24
+}
+
+.badge.status-active{
+  background:rgba(34,197,94,.15);
+  color:#4ade80
+}
+
+.badge.status-rejected{
+  background:rgba(239,68,68,.15);
+  color:#f87171
+}
+
+.actions{
+  display:flex;
+  gap:8px
+}
+
+.abtn{
+  padding:7px 14px;
+  border-radius:7px;
+  font-family:'Space Grotesk',sans-serif;
+  font-size:12.5px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .2s;
+  border:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:5px;
+  white-space:nowrap
+}
+
+.abtn.approve{
+  background:rgba(34,197,94,.12);
+  color:#4ade80;
+  border-color:rgba(34,197,94,.3)
+}
+
+.abtn.approve:hover{
+  background:rgba(34,197,94,.22)
+}
+
+.abtn.reject{
+  background:rgba(239,68,68,.1);
+  color:#f87171;
+  border-color:rgba(239,68,68,.3)
+}
+
+.abtn.reject:hover{
+  background:rgba(239,68,68,.2)
+}
+
+/* NEW: Remove button */
+
+.abtn.remove{
+  background:rgba(239,68,68,.1);
+  color:#f87171;
+  border-color:rgba(239,68,68,.3)
+}
+
+.abtn.remove:hover{
+  background:rgba(239,68,68,.22);
+  border-color:rgba(239,68,68,.5)
+}
+
+.abtn:disabled{
+  opacity:.5;
+  cursor:not-allowed
+}
+
+.empty{
+  color:var(--muted);
+  font-size:13.5px;
+  text-align:center;
+  padding:60px 20px
+}
+
+.empty .ic{
+  font-size:34px;
+  margin-bottom:10px;
+  display:block
+}
+
+.toast{
+  position:fixed;
+  bottom:24px;
+  right:24px;
+  left:24px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:13px 18px;
+  font-size:13.5px;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+  display:none;
+  align-items:center;
+  gap:10px;
+  z-index:300;
+  max-width:320px;
+  margin:0 0 0 auto
+}
+
+.toast.show{
+  display:flex;
+  animation:slidein .25s ease
+}
+
+.toast.ok{
+  border-color:rgba(34,197,94,.4);
+  color:#4ade80
+}
+
+.toast.err{
+  border-color:rgba(239,68,68,.4);
+  color:#f87171
+}
+
+@keyframes slidein{
+  from{
+    opacity:0;
+    transform:translateY(10px)
+  }
+  to{
+    opacity:1;
+    transform:translateY(0)
+  }
+}
+
+.spin{
+  display:inline-block;
+  width:12px;
+  height:12px;
+  border:2px solid rgba(255,255,255,.25);
+  border-top-color:currentColor;
+  border-radius:50%;
+  animation:spin .6s linear infinite
+}
+
+@keyframes spin{
+  to{
+    transform:rotate(360deg)
+  }
+}
 
 /* ---------- Mobile ---------- */
+
 @media (max-width:768px){
-  .sidebar{transform:translateX(-100%);box-shadow:4px 0 24px rgba(0,0,0,.4)}
-  .sidebar.open{transform:translateX(0)}
-  .close-sidebar{display:block}
-  .main{margin-left:0}
-  .menu-toggle{display:flex}
-  .topbar{padding:0 16px;height:52px}
-  .page-title{font-size:15px}
-  .tb-btn-label{display:none}
-  .tb-btn{padding:8px 10px}
-  .content{padding:16px}
-  .toolbar{flex-direction:column;align-items:stretch}
-  .search{width:100%}
-  .tabs{width:100%}
-  .tab{flex:1;justify-content:center}
-  .table-scroll{border-top:1px solid var(--border)}
-  thead th,tbody td{padding:12px 14px}
-  .p-name,.p-email{white-space:normal}
-  .actions{gap:6px}
-  .abtn{padding:6px 10px;font-size:11.5px}
-  .toast{left:16px;right:16px;bottom:16px;max-width:none}
+
+  .sidebar{
+    transform:translateX(-100%);
+    box-shadow:4px 0 24px rgba(0,0,0,.4)
+  }
+
+  .sidebar.open{
+    transform:translateX(0)
+  }
+
+  .close-sidebar{
+    display:block
+  }
+
+  .main{
+    margin-left:0
+  }
+
+  .menu-toggle{
+    display:flex
+  }
+
+  .topbar{
+    padding:0 16px;
+    height:52px
+  }
+
+  .page-title{
+    font-size:15px
+  }
+
+  .tb-btn-label{
+    display:none
+  }
+
+  .tb-btn{
+    padding:8px 10px
+  }
+
+  .content{
+    padding:16px
+  }
+
+  .toolbar{
+    flex-direction:column;
+    align-items:stretch
+  }
+
+  .search{
+    width:100%
+  }
+
+  .tabs{
+    width:100%
+  }
+
+  .tab{
+    flex:1;
+    justify-content:center
+  }
+
+  .table-scroll{
+    border-top:1px solid var(--border)
+  }
+
+  thead th,
+  tbody td{
+    padding:12px 14px
+  }
+
+  .p-name,
+  .p-email{
+    white-space:normal
+  }
+
+  .actions{
+    gap:6px
+  }
+
+  .abtn{
+    padding:6px 10px;
+    font-size:11.5px
+  }
+
+  .toast{
+    left:16px;
+    right:16px;
+    bottom:16px;
+    max-width:none
+  }
 }
+
 </style>
 </head>
+
 <body>
+
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
 <nav class="sidebar" id="sidebar">
+
   <div class="sl">
+
     <div class="li">⚡</div>
+
     <div class="lt">Work<span>Flow</span></div>
+
     <button class="close-sidebar" onclick="closeSidebar()">✕</button>
+
   </div>
+
   <div class="ns">
+
     <div class="nl">Main</div>
-    <a class="ni" href="dashboard.html"><span class="nico">⊞</span>Dashboard</a>
-    <a class="ni" href="issues.html"><span class="nico">📋</span>Issues</a>
-    <a class="ni" href="board.html"><span class="nico">🗂</span>Board</a>
-    <a class="ni" href="backlog.html"><span class="nico">📌</span>Backlog</a>
+
+    <a class="ni" href="dashboard.html">
+      <span class="nico">⊞</span>Dashboard
+    </a>
+
+    <a class="ni" href="issues.html">
+      <span class="nico">◈</span>Issues
+    </a>
+
+    <a class="ni" href="board.html">
+      <span class="nico">▦</span>Board
+    </a>
+
+    <a class="ni" href="backlog.html">
+      <span class="nico">▤</span>Backlog
+    </a>
+
     <div class="nl">Planning</div>
-    <a class="ni" href="sprints.html"><span class="nico">🏃</span>Sprints</a>
-    <a class="ni" href="reports.html"><span class="nico">📊</span>Reports</a>
+
+    <a class="ni" href="sprints.html">
+      <span class="nico">◫</span>Sprints
+    </a>
+
+    <a class="ni" href="reports.html">
+      <span class="nico">▥</span>Reports
+    </a>
+
     <div class="nl" id="adminSectionLabel" style="display:none">Admin</div>
-    <a class="ni" id="navAdminDashboard" href="admin-dashboard.html" style="display:none"><span class="nico">🛡</span>Admin Dashboard</a>
-    <a class="ni active" id="navEmployeeMgmt" href="employee-management.html" style="display:none"><span class="nico">👥</span>Team<span class="nbadge warn" id="pendingBadge" style="display:none">0</span></a>
+
+    <a class="ni" id="navAdminDashboard" href="admin-dashboard.html" style="display:none">
+      <span class="nico">◉</span>Admin Dashboard
+    </a>
+
+    <a class="ni active" id="navEmployeeMgmt" href="employee-management.html" style="display:none">
+      <span class="nico">♟</span>Team
+      <span class="nbadge warn" id="pendingBadge" style="display:none">0</span>
+    </a>
+
     <div class="nl">Settings</div>
-    <a class="ni" href="workflows.html"><span class="nico">🔄</span>Workflows</a>
-    <a class="ni" href="profile.html"><span class="nico">👤</span>Profile</a>
+
+    <a class="ni" href="workflows.html">
+      <span class="nico">⚙</span>Workflows
+    </a>
+
+    <a class="ni" href="profile.html">
+      <span class="nico">◎</span>Profile
+    </a>
+
   </div>
+
   <div class="sf">
+
     <div class="uc">
+
       <div class="av" id="sideAvatar">U</div>
+
       <div style="min-width:0;flex:1">
+
         <div class="un" id="sideEmail">Loading...</div>
+
         <div class="ur" id="sideRole">—</div>
+
       </div>
+
     </div>
+
     <button class="logout-btn" onclick="logout()">🚪 Sign Out</button>
+
   </div>
+
 </nav>
+
 <div class="main">
+
   <div class="topbar">
+
     <div class="tb-left">
+
       <button class="menu-toggle" onclick="openSidebar()">☰</button>
+
       <div class="page-title">Team Management</div>
+
     </div>
+
     <div class="tb-right">
-      <a class="tb-btn" href="admin-dashboard.html">🛡 <span class="tb-btn-label">Admin Dashboard</span></a>
+
+      <a class="tb-btn" href="admin-dashboard.html">
+        🛡 <span class="tb-btn-label">Admin Dashboard</span>
+      </a>
+
     </div>
+
   </div>
+
   <div class="content">
-    <div class="gate" id="accessGate">You're signed in, but only organization admins can approve or reject team members.</div>
+
+    <div class="gate" id="accessGate">
+      You're signed in, but only organization admins can approve or reject team members.
+    </div>
 
     <div class="toolbar">
+
       <div class="tabs">
-        <button class="tab active" data-tab="pending" onclick="switchTab('pending')">⏳ Pending <span class="cnt" id="cntPending">0</span></button>
+
+        <button class="tab active" data-tab="pending" onclick="switchTab('pending')">
+          ⏳ Pending
+          <span class="cnt" id="cntPending">0</span>
+        </button>
+
+        <button class="tab" data-tab="active" onclick="switchTab('active')">
+          👥 Active Members
+          <span class="cnt" id="cntActive">0</span>
+        </button>
+
       </div>
-      <input class="search" id="searchInput" placeholder="Search name or email..." oninput="renderList()"/>
+
+      <input
+        class="search"
+        id="searchInput"
+        placeholder="Search name or email..."
+        oninput="renderList()"
+      />
+
     </div>
 
     <div class="panel">
+
       <div class="table-scroll">
+
         <table>
+
           <thead>
+
             <tr>
+
               <th>Member</th>
+
               <th>Role</th>
+
               <th>Status</th>
+
               <th style="text-align:right">Actions</th>
+
             </tr>
+
           </thead>
+
           <tbody id="tableBody">
-            <tr><td colspan="4"><div class="empty">Loading...</div></td></tr>
+
+            <tr>
+              <td colspan="4">
+                <div class="empty">Loading...</div>
+              </td>
+            </tr>
+
           </tbody>
+
         </table>
+
       </div>
+
     </div>
+
   </div>
+
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
+
 const API = window.location.origin;
+
 const token = sessionStorage.getItem('token');
-if (!token) window.location.href = 'login.html';
-const headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
-const email = sessionStorage.getItem('userEmail') || '';
 
-document.getElementById('sideEmail').textContent = email;
-document.getElementById('sideAvatar').textContent = email ? email[0].toUpperCase() : 'U';
-
-function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebarOverlay').classList.add('show');}
-function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('show');}
-
-// Decode role from JWT payload for UI purposes only.
-// Server-side authorization (hasRole("ADMIN")) is the real enforcement.
-function getRoleFromToken() {
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
-    return payload.role || null;
-  } catch (e) {
-    return null;
-  }
-}
-
-const role = getRoleFromToken();
-document.getElementById('sideRole').textContent = role || '—';
-const isAdmin = role === 'ADMIN';
-
-if (isAdmin) {
-  document.getElementById('adminSectionLabel').style.display = '';
-  document.getElementById('navAdminDashboard').style.display = '';
-  document.getElementById('navEmployeeMgmt').style.display = '';
-} else {
-  document.getElementById('accessGate').classList.add('show');
-}
-
-function logout() {
-  sessionStorage.clear();
+if (!token) {
   window.location.href = 'login.html';
 }
 
+const headers = {
+  'Content-Type': 'application/json',
+  'Authorization': 'Bearer ' + token
+};
+
+const email = sessionStorage.getItem('userEmail') || '';
+
+document.getElementById('sideEmail').textContent = email;
+
+document.getElementById('sideAvatar').textContent =
+  email ? email[0].toUpperCase() : 'U';
+
+
+function openSidebar(){
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('show');
+}
+
+
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+
+// Decode role from JWT payload for UI purposes only.
+// Server-side authorization is the real enforcement.
+
+function getRoleFromToken() {
+
+  try {
+
+    const payload = JSON.parse(
+      atob(
+        token
+          .split('.')[1]
+          .replace(/-/g, '+')
+          .replace(/_/g, '/')
+      )
+    );
+
+    return payload.role || null;
+
+  } catch (e) {
+
+    return null;
+
+  }
+
+}
+
+
+const role = getRoleFromToken();
+
+document.getElementById('sideRole').textContent = role || '—';
+
+const isAdmin = role === 'ADMIN';
+
+
+if (isAdmin) {
+
+  document.getElementById('adminSectionLabel').style.display = '';
+
+  document.getElementById('navAdminDashboard').style.display = '';
+
+  document.getElementById('navEmployeeMgmt').style.display = '';
+
+} else {
+
+  document.getElementById('accessGate').classList.add('show');
+
+}
+
+
+function logout() {
+
+  sessionStorage.clear();
+
+  window.location.href = 'login.html';
+
+}
+
+
+/* =========================================================
+   MEMBER DATA
+   ========================================================= */
+
 let pendingUsers = [];
 
+let activeUsers = [];
+
+let currentTab = 'pending';
+
+
 function initials(name, fallback) {
+
   const src = (name || fallback || '?').trim();
+
   return src ? src[0].toUpperCase() : '?';
+
 }
+
 
 function showToast(msg, type = 'ok') {
+
   const el = document.getElementById('toast');
+
   el.textContent = msg;
+
   el.className = 'toast ' + type + ' show';
+
   setTimeout(() => el.classList.remove('show'), 3000);
+
 }
+
+
+/* =========================================================
+   TAB SWITCH
+   ========================================================= */
 
 function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+
+  currentTab = tab;
+
+  document
+    .querySelectorAll('.tab')
+    .forEach(t =>
+      t.classList.toggle(
+        'active',
+        t.dataset.tab === tab
+      )
+    );
+
   renderList();
+
 }
+
+
+/* =========================================================
+   RENDER LIST
+   ========================================================= */
 
 function renderList() {
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  const filtered = pendingUsers.filter(u =>
-    !q || (u.userName || '').toLowerCase().includes(q) || (u.userOfficialEmail || '').toLowerCase().includes(q)
-  );
 
-  document.getElementById('cntPending').textContent = pendingUsers.length;
-  const badge = document.getElementById('pendingBadge');
+  const q =
+    document
+      .getElementById('searchInput')
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const users =
+    currentTab === 'pending'
+      ? pendingUsers
+      : activeUsers;
+
+
+  const filtered =
+    users.filter(u =>
+
+      !q ||
+
+      (u.userName || '')
+        .toLowerCase()
+        .includes(q) ||
+
+      (u.userOfficialEmail || '')
+        .toLowerCase()
+        .includes(q)
+
+    );
+
+
+  document.getElementById('cntPending').textContent =
+    pendingUsers.length;
+
+  document.getElementById('cntActive').textContent =
+    activeUsers.length;
+
+
+  const badge =
+    document.getElementById('pendingBadge');
+
+
   if (pendingUsers.length > 0) {
+
     badge.style.display = '';
+
     badge.textContent = pendingUsers.length;
+
   } else {
+
     badge.style.display = 'none';
+
   }
 
-  const body = document.getElementById('tableBody');
+
+  const body =
+    document.getElementById('tableBody');
+
+
   if (!filtered.length) {
-    body.innerHTML = `<tr><td colspan="4"><div class="empty"><span class="ic">🎉</span>${pendingUsers.length === 0 ? 'No pending approvals right now' : 'No matches for your search'}</div></td></tr>`;
+
+    body.innerHTML = `
+      <tr>
+        <td colspan="4">
+          <div class="empty">
+            <span class="ic">
+              ${currentTab === 'pending' ? '🎉' : '👥'}
+            </span>
+
+            ${
+              currentTab === 'pending'
+                ? (
+                    pendingUsers.length === 0
+                      ? 'No pending approvals right now'
+                      : 'No matches for your search'
+                  )
+                : (
+                    activeUsers.length === 0
+                      ? 'No active members found'
+                      : 'No matches for your search'
+                  )
+            }
+
+          </div>
+        </td>
+      </tr>
+    `;
+
     return;
+
   }
 
-  body.innerHTML = filtered.map(u => `
-    <tr id="row-${u.id}">
-      <td>
-        <div class="person">
-          <div class="p-av">${initials(u.userName, u.userOfficialEmail)}</div>
-          <div>
-            <div class="p-name">${u.userName || 'Unnamed'}</div>
-            <div class="p-email">${u.userOfficialEmail || ''}</div>
+
+  /* =========================================================
+     PENDING MEMBERS
+     ========================================================= */
+
+  if (currentTab === 'pending') {
+
+    body.innerHTML =
+      filtered.map(u => `
+
+        <tr id="row-${u.id}">
+
+          <td>
+
+            <div class="person">
+
+              <div class="p-av">
+                ${initials(u.userName, u.userOfficialEmail)}
+              </div>
+
+              <div>
+
+                <div class="p-name">
+                  ${u.userName || 'Unnamed'}
+                </div>
+
+                <div class="p-email">
+                  ${u.userOfficialEmail || ''}
+                </div>
+
+              </div>
+
+            </div>
+
+          </td>
+
+
+          <td>
+            <span class="badge role">
+              ${u.role || '—'}
+            </span>
+          </td>
+
+
+          <td>
+            <span class="badge status-pending">
+              ${u.status || 'PENDING'}
+            </span>
+          </td>
+
+
+          <td>
+
+            <div
+              class="actions"
+              style="justify-content:flex-end"
+            >
+
+              <button
+                class="abtn approve"
+                onclick="decide(${u.id}, 'approve')"
+                ${!isAdmin ? 'disabled' : ''}
+              >
+                ✓ Approve
+              </button>
+
+
+              <button
+                class="abtn reject"
+                onclick="decide(${u.id}, 'reject')"
+                ${!isAdmin ? 'disabled' : ''}
+              >
+                ✕ Reject
+              </button>
+
+            </div>
+
+          </td>
+
+        </tr>
+
+      `).join('');
+
+    return;
+
+  }
+
+
+  /* =========================================================
+     ACTIVE MEMBERS
+     ========================================================= */
+
+  body.innerHTML =
+    filtered.map(u => `
+
+      <tr id="active-row-${u.id}">
+
+        <td>
+
+          <div class="person">
+
+            <div class="p-av">
+              ${initials(u.userName, u.userOfficialEmail)}
+            </div>
+
+            <div>
+
+              <div class="p-name">
+                ${u.userName || 'Unnamed'}
+              </div>
+
+              <div class="p-email">
+                ${u.userOfficialEmail || ''}
+              </div>
+
+            </div>
+
           </div>
-        </div>
-      </td>
-      <td><span class="badge role">${u.role || '—'}</span></td>
-      <td><span class="badge status-pending">${u.status || 'PENDING'}</span></td>
-      <td>
-        <div class="actions" style="justify-content:flex-end">
-          <button class="abtn approve" onclick="decide(${u.id}, 'approve')" ${!isAdmin ? 'disabled' : ''}>✓ Approve</button>
-          <button class="abtn reject" onclick="decide(${u.id}, 'reject')" ${!isAdmin ? 'disabled' : ''}>✕ Reject</button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
+
+        </td>
+
+
+        <td>
+          <span class="badge role">
+            ${u.role || '—'}
+          </span>
+        </td>
+
+
+        <td>
+          <span class="badge status-active">
+            ${u.status || 'ACTIVE'}
+          </span>
+        </td>
+
+
+        <td>
+
+          <div
+            class="actions"
+            style="justify-content:flex-end"
+          >
+
+            <button
+              class="abtn remove"
+              onclick="removeMember(${u.id})"
+              ${!isAdmin ? 'disabled' : ''}
+            >
+              🗑 Remove
+            </button>
+
+          </div>
+
+        </td>
+
+      </tr>
+
+    `).join('');
+
 }
+
+
+/* =========================================================
+   LOAD PENDING USERS
+   ========================================================= */
 
 async function loadPendingUsers() {
+
   if (!isAdmin) {
-    document.getElementById('tableBody').innerHTML = '<tr><td colspan="4"><div class="empty">Admin access required</div></td></tr>';
+
+    document.getElementById('tableBody').innerHTML = `
+      <tr>
+        <td colspan="4">
+          <div class="empty">
+            Admin access required
+          </div>
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+
+  try {
+
+    const res =
+      await fetch(
+        API + '/api/admin/pending-users',
+        { headers }
+      );
+
+
+    if (!res.ok) {
+      throw new Error('Failed to load pending users');
+    }
+
+
+    pendingUsers =
+      await res.json();
+
+
+    renderList();
+
+
+  } catch (e) {
+
+    document.getElementById('tableBody').innerHTML = `
+      <tr>
+        <td colspan="4">
+          <div class="empty">
+            Could not load pending members
+          </div>
+        </td>
+      </tr>
+    `;
+
+  }
+
+}
+
+
+/* =========================================================
+   LOAD ACTIVE USERS
+   ========================================================= */
+
+async function loadActiveUsers() {
+
+  if (!isAdmin) {
     return;
   }
+
+
   try {
-    const res = await fetch(API + '/api/admin/pending-users', { headers });
-    if (!res.ok) throw new Error('Failed to load pending users');
-    pendingUsers = await res.json();
+
+    const res =
+      await fetch(
+        API + '/api/admin/active-users',
+        { headers }
+      );
+
+
+    if (!res.ok) {
+      throw new Error('Failed to load active users');
+    }
+
+
+    activeUsers =
+      await res.json();
+
+
     renderList();
+
+
   } catch (e) {
-    document.getElementById('tableBody').innerHTML = '<tr><td colspan="4"><div class="empty">Could not load pending members</div></td></tr>';
+
+    activeUsers = [];
+
+    if (currentTab === 'active') {
+
+      document.getElementById('tableBody').innerHTML = `
+        <tr>
+          <td colspan="4">
+            <div class="empty">
+              Could not load active members
+            </div>
+          </td>
+        </tr>
+      `;
+
+    }
+
   }
+
 }
+
+
+/* =========================================================
+   APPROVE / REJECT
+   ========================================================= */
 
 async function decide(userId, action) {
-  const row = document.getElementById('row-' + userId);
-  const buttons = row ? row.querySelectorAll('.abtn') : [];
-  buttons.forEach(b => { b.disabled = true; });
-  const clickedBtn = row ? row.querySelector(`.abtn.${action === 'approve' ? 'approve' : 'reject'}`) : null;
-  const originalHtml = clickedBtn ? clickedBtn.innerHTML : '';
-  if (clickedBtn) clickedBtn.innerHTML = '<span class="spin"></span>';
+
+  const row =
+    document.getElementById('row-' + userId);
+
+
+  const buttons =
+    row
+      ? row.querySelectorAll('.abtn')
+      : [];
+
+
+  buttons.forEach(
+    b => {
+      b.disabled = true;
+    }
+  );
+
+
+  const clickedBtn =
+    row
+      ? row.querySelector(
+          `.abtn.${
+            action === 'approve'
+              ? 'approve'
+              : 'reject'
+          }`
+        )
+      : null;
+
+
+  const originalHtml =
+    clickedBtn
+      ? clickedBtn.innerHTML
+      : '';
+
+
+  if (clickedBtn) {
+    clickedBtn.innerHTML =
+      '<span class="spin"></span>';
+  }
+
 
   try {
-    const res = await fetch(API + '/api/admin/' + action + '/' + userId, {
-      method: 'PUT',
-      headers
-    });
+
+    const res =
+      await fetch(
+        API + '/api/admin/' + action + '/' + userId,
+        {
+          method:'PUT',
+          headers
+        }
+      );
+
+
     if (!res.ok) {
-      const d = await res.json().catch(() => ({}));
-      throw new Error(d.message || d.error || 'Action failed');
+
+      const d =
+        await res
+          .json()
+          .catch(() => ({}));
+
+
+      throw new Error(
+        d.message ||
+        d.error ||
+        'Action failed'
+      );
+
     }
-    pendingUsers = pendingUsers.filter(u => u.id !== userId);
+
+
+    pendingUsers =
+      pendingUsers.filter(
+        u => u.id !== userId
+      );
+
+
+    /* Reload active users after approval */
+
+    await loadActiveUsers();
+
+
     renderList();
-    showToast(action === 'approve' ? 'Member approved' : 'Member rejected', action === 'approve' ? 'ok' : 'err');
+
+
+    showToast(
+      action === 'approve'
+        ? 'Member approved'
+        : 'Member rejected',
+
+      action === 'approve'
+        ? 'ok'
+        : 'err'
+    );
+
+
   } catch (e) {
-    showToast(e.message, 'err');
-    buttons.forEach(b => { b.disabled = false; });
-    if (clickedBtn) clickedBtn.innerHTML = originalHtml;
+
+    showToast(
+      e.message,
+      'err'
+    );
+
+
+    buttons.forEach(
+      b => {
+        b.disabled = false;
+      }
+    );
+
+
+    if (clickedBtn) {
+      clickedBtn.innerHTML =
+        originalHtml;
+    }
+
   }
+
 }
 
+
+/* =========================================================
+   REMOVE ACTIVE MEMBER
+   ========================================================= */
+
+async function removeMember(userId) {
+
+  if (!isAdmin) {
+    return;
+  }
+
+
+  const member =
+    activeUsers.find(
+      u => u.id === userId
+    );
+
+
+  const memberName =
+    member?.userName ||
+    member?.userOfficialEmail ||
+    'this member';
+
+
+  const confirmed =
+    confirm(
+      `Are you sure you want to remove ${memberName} from the team?`
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  const row =
+    document.getElementById(
+      'active-row-' + userId
+    );
+
+
+  const buttons =
+    row
+      ? row.querySelectorAll('.abtn')
+      : [];
+
+
+  buttons.forEach(
+    b => {
+      b.disabled = true;
+    }
+  );
+
+
+  const clickedBtn =
+    row
+      ? row.querySelector('.abtn.remove')
+      : null;
+
+
+  const originalHtml =
+    clickedBtn
+      ? clickedBtn.innerHTML
+      : '';
+
+
+  if (clickedBtn) {
+    clickedBtn.innerHTML =
+      '<span class="spin"></span>';
+  }
+
+
+  try {
+
+    const res =
+      await fetch(
+        API + '/api/admin/remove/' + userId,
+        {
+          method:'PUT',
+          headers
+        }
+      );
+
+
+    if (!res.ok) {
+
+      const d =
+        await res
+          .json()
+          .catch(() => ({}));
+
+
+      throw new Error(
+        d.message ||
+        d.error ||
+        'Failed to remove member'
+      );
+
+    }
+
+
+    activeUsers =
+      activeUsers.filter(
+        u => u.id !== userId
+      );
+
+
+    renderList();
+
+
+    showToast(
+      'Member removed successfully',
+      'ok'
+    );
+
+
+  } catch (e) {
+
+    showToast(
+      e.message,
+      'err'
+    );
+
+
+    buttons.forEach(
+      b => {
+        b.disabled = false;
+      }
+    );
+
+
+    if (clickedBtn) {
+      clickedBtn.innerHTML =
+        originalHtml;
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   INITIAL LOAD
+   ========================================================= */
+
 loadPendingUsers();
+
+loadActiveUsers();
+
 </script>
+
 </body>
 </html>

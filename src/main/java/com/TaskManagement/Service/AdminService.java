@@ -61,6 +61,26 @@ public class AdminService {
 		userAuthRepository.save(user);
 	}
 
+	public void removeUser(Long userId, String adminEmail) {
+
+		Long organizationId = resolveAdminOrganizationId(adminEmail);
+
+		UserAuth user = userAuthRepository.findById(userId)
+				.orElseThrow(() -> new RuntimeException("User not found"));
+
+		if (user.getOrganization() == null
+				|| !user.getOrganization().getId().equals(organizationId)) {
+			throw new RuntimeException("User does not belong to your organization");
+		}
+
+		if (user.getRole() == Role.ADMIN) {
+			throw new RuntimeException("Admin cannot be removed");
+		}
+
+		user.setStatus(UserStatus.INACTIVE);
+		userAuthRepository.save(user);
+	}
+
 	/**
 	 * Resolves the organizationId of the currently authenticated admin,
 	 * based on their email from the JWT — never trust an organizationId
@@ -83,6 +103,7 @@ public class AdminService {
 	}
 
 	private EmployeeStatusDTO toDTO(UserAuth user) {
+
 		return EmployeeStatusDTO.builder()
 				.id(user.getId())
 				.userName(user.getUserName())
@@ -90,5 +111,15 @@ public class AdminService {
 				.role(user.getRole())
 				.status(user.getStatus())
 				.build();
+	}
+	public List<EmployeeStatusDTO> getEmployees(String adminEmail) {
+
+		Long organizationId = resolveAdminOrganizationId(adminEmail);
+
+		return userAuthRepository
+				.findByOrganizationId(organizationId)
+				.stream()
+				.map(this::toDTO)
+				.collect(Collectors.toList());
 	}
 }

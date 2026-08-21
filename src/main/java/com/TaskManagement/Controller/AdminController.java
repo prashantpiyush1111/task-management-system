@@ -39,4 +39,21 @@ public class AdminController {
 		adminService.rejectUser(userId, authentication.getName());
 		return ResponseEntity.ok("User rejected successfully");
 	}
+	@PutMapping("/remove/{userId}")
+	public ResponseEntity<String> removeUser(
+	        @PathVariable Long userId,
+	        Authentication authentication) {
+
+	    adminService.removeUser(userId, authentication.getName());
+
+	    return ResponseEntity.ok("User removed from team successfully");
+	}
+	@GetMapping("/employees")
+	public ResponseEntity<List<EmployeeStatusDTO>> getEmployees(
+	        Authentication authentication) {
+
+	    return ResponseEntity.ok(
+	            adminService.getEmployees(authentication.getName())
+	    );
+	}
 }
