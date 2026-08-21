@@ -79,6 +79,7 @@ public class SecurityConfig {
             			    "/api/user-auth/login",
             			    "/api/user-auth/forgot-password",
             			    "/api/user-auth/reset-password",
+            			    "/api/integration/**",
 
             			    "/api/organizations/register",
             			    "/api/organizations"
