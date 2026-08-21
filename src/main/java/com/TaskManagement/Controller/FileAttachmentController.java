@@ -3,6 +3,7 @@ package com.TaskManagement.Controller;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,17 @@ public class FileAttachmentController {
 		String uploadedBy = authentication.getName();
 		Long organizationId = resolveOrganizationId(authentication);
 		return ResponseEntity.ok(attachmentService.upload(issueId, file, uploadedBy, organizationId));
+	}
+	@GetMapping("/issue/{issueId}")
+	public ResponseEntity<List<FileAttachment>> getAttachments(
+	        @PathVariable Long issueId,
+	        Authentication authentication) {
+
+	    Long organizationId = resolveOrganizationId(authentication);
+
+	    return ResponseEntity.ok(
+	            attachmentService.getFileByIssueId(issueId, organizationId)
+	    );
 	}
 
 	@GetMapping("/download/{id}")

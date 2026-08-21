@@ -8,14 +8,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.TaskManagement.Entity.FileAttachment;
 import com.TaskManagement.Repository.FileAttachmentRepository;
+import com.TaskManagement.Entity.Issue;
+import com.TaskManagement.Repository.IssueRepository;
 import com.cloudinary.Cloudinary;
 @Service
 public class AttachmentService {
 	@Autowired
 	private Cloudinary cloudinary;
 	@Autowired
+	private IssueRepository issueRepository;
+	@Autowired
 	private FileAttachmentRepository attachmentRepo;
 	public FileAttachment upload(Long issueId, MultipartFile file, String uploadedBy, Long organizationId) {
+		Issue issue = issueRepository.findByIdAndOrganizationId(issueId, organizationId)
+		        .orElseThrow(() -> new RuntimeException("Issue not found for this organization"));
 		validateFile(file);
 		try {
 			Map<String, Object> uploadOption = new HashMap<>();
@@ -65,14 +71,39 @@ public class AttachmentService {
 		return attach;
 	}
 	public void delete(Long id, Long organizationId) {
-		FileAttachment atch = getFileById(id, organizationId);
-		try {
-			Map<String, Object> options = new HashMap<>();
-			options.put("resource_type", "auto");
-			cloudinary.uploader().destroy(atch.getCloudId(), options);
-			attachmentRepo.delete(atch);
-		} catch (Exception e) {
-			throw new RuntimeException("Delete Failed", e);
-		}
+
+	    FileAttachment atch = getFileById(id, organizationId);
+
+	    try {
+
+	        Map<String, Object> options = new HashMap<>();
+
+	        String contentType = atch.getFileContentType();
+
+	        if (contentType != null &&
+	            (contentType.equals("image/png") ||
+	             contentType.equals("image/jpeg"))) {
+
+	            options.put("resource_type", "image");
+
+	        } else {
+
+	            options.put("resource_type", "raw");
+	        }
+
+	        options.put("invalidate", true);
+
+	        cloudinary.uploader().destroy(atch.getCloudId(), options);
+
+	        attachmentRepo.delete(atch);
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+
+	        throw new RuntimeException(
+	            "Delete Failed: " + e.getMessage(), e
+	        );
+	    }
 	}
 }
