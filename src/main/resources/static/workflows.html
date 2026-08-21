@@ -136,13 +136,13 @@ textarea{resize:vertical;min-height:70px}
 <div class="toast" id="toast"></div>
 <script>
 const API = window.location.origin;
-const token=localStorage.getItem('token');
+const token=sessionStorage.getItem('token');
 if(!token)window.location.href='login.html';
 const headers={'Content-Type':'application/json','Authorization':'Bearer '+token};
-const email=localStorage.getItem('userEmail')||'';
+const email=sessionStorage.getItem('userEmail')||'';
 document.getElementById('sideEmail').textContent=email;
 document.getElementById('sideAvatar').textContent=email?email[0].toUpperCase():'U';
-function logout(){localStorage.clear();window.location.href='login.html';}
+function logout(){sessionStorage.clear();window.location.href='login.html';}
 
 const STATUSES=['OPEN','TODO','IN_PROGRESS','IN_REVIEW','DONE','BLOCKED','CLOSED','REOPENED','DEPLOYMENT'];
 const ROLES=['ADMIN','MANAGER','DEVELOPER','TESTER'];

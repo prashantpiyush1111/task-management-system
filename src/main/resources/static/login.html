@@ -1123,12 +1123,12 @@ async function doLogin() {
     }
 
 
-    localStorage.setItem(
+    sessionStorage.setItem(
       'token',
       data.token
     );
 
-    localStorage.setItem(
+    sessionStorage.setItem(
       'userEmail',
       email
     );
@@ -1558,12 +1558,12 @@ async function createCompany() {
        and ACTIVE.
     */
 
-    localStorage.setItem(
+    sessionStorage.setItem(
       'token',
       data.token
     );
 
-    localStorage.setItem(
+    sessionStorage.setItem(
       'userEmail',
       adminEmail
     );
@@ -1739,7 +1739,7 @@ async function doForgot() {
 ========================= */
 
 if (
-  localStorage.getItem('token')
+  sessionStorage.getItem('token')
 ) {
 
   window.location.href =

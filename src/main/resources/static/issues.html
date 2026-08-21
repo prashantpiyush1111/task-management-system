@@ -209,13 +209,13 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 </div>
 <script>
 const API = window.location.origin;
-const token=localStorage.getItem('token');
+const token=sessionStorage.getItem('token');
 if(!token)window.location.href='login.html';
 const headers={'Content-Type':'application/json','Authorization':'Bearer '+token};
-const email=localStorage.getItem('userEmail')||'';
+const email=sessionStorage.getItem('userEmail')||'';
 document.getElementById('sideEmail').textContent=email;
 document.getElementById('sideAvatar').textContent=email?email[0].toUpperCase():'U';
-function logout(){localStorage.clear();window.location.href='login.html';}
+function logout(){sessionStorage.clear();window.location.href='login.html';}
 let allIssues=[];
 function statusBadge(s){const m={TODO:'todo',IN_PROGRESS:'inprog',DONE:'done',BLOCKED:'blocked',IN_REVIEW:'review',OPEN:'open'};return`<span class="badge ${m[s]||'open'}">${s||'OPEN'}</span>`}
 function priorityBadge(p){const m={LOW:'low',MEDIUM:'medium',HIGH:'high',CRITICAL:'critical'};return`<span class="badge ${m[p]||'medium'}">${p||'—'}</span>`}

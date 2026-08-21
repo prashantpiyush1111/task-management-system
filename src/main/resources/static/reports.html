@@ -179,13 +179,13 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--tex
 
 <script>
 const API = window.location.origin;
-const token=localStorage.getItem('token');
+const token=sessionStorage.getItem('token');
 if(!token)window.location.href='login.html';
 const headers={'Authorization':'Bearer '+token};
-const email=localStorage.getItem('userEmail')||'';
+const email=sessionStorage.getItem('userEmail')||'';
 document.getElementById('sideEmail').textContent=email;
 document.getElementById('sideAvatar').textContent=email?email[0].toUpperCase():'U';
-function logout(){localStorage.clear();window.location.href='login.html';}
+function logout(){sessionStorage.clear();window.location.href='login.html';}
 
 function showToast(msg,type='ok'){
   const t=document.getElementById('toast');

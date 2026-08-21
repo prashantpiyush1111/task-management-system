@@ -153,17 +153,17 @@ input:checked+.toggle-slider:before{transform:translateX(20px)}
 <div class="toast" id="toast"></div>
 <script>
 const API = window.location.origin;
-const token=localStorage.getItem('token');
+const token=sessionStorage.getItem('token');
 if(!token)window.location.href='login.html';
 const headers={'Content-Type':'application/json','Authorization':'Bearer '+token};
-const email=localStorage.getItem('userEmail')||'';
+const email=sessionStorage.getItem('userEmail')||'';
 document.getElementById('sideEmail').textContent=email;
 document.getElementById('sideAvatar').textContent=email?email[0].toUpperCase():'U';
 document.getElementById('bigAvatar').textContent=email?email[0].toUpperCase():'U';
 document.getElementById('heroEmail').textContent=email;
 document.getElementById('heroName').textContent=email.split('@')[0]||'User';
 document.getElementById('profEmail').value=email;
-function logout(){localStorage.clear();window.location.href='login.html';}
+function logout(){sessionStorage.clear();window.location.href='login.html';}
 function showToast(msg,type='ok'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+type;setTimeout(()=>t.className='toast',2500);}
 
 async function loadProfile(){

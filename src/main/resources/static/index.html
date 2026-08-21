@@ -1179,12 +1179,12 @@
                 }
 
 
-                localStorage.setItem(
+                sessionStorage.setItem(
                     'token',
                     data.token
                 );
 
-                localStorage.setItem(
+                sessionStorage.setItem(
                     'userEmail',
                     email
                 );
@@ -1427,7 +1427,7 @@
                  * return a JWT for PENDING users.
                  */
 
-                localStorage.removeItem('token');
+                sessionStorage.removeItem('token');
 
 
                 showAlert(
@@ -1601,12 +1601,12 @@
                 }
 
 
-                localStorage.setItem(
+                sessionStorage.setItem(
                     'token',
                     data.token
                 );
 
-                localStorage.setItem(
+                sessionStorage.setItem(
                     'userEmail',
                     adminEmail
                 );
@@ -1760,7 +1760,7 @@
            INITIAL LOAD
         ========================= */
 
-        if (localStorage.getItem('token')) {
+        if (sessionStorage.getItem('token')) {
 
             window.location.href =
                 'dashboard.html';

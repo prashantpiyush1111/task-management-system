@@ -180,8 +180,8 @@ async function doRegisterOrg() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || data.error || 'Registration failed');
 
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('userEmail', adminEmail);
+    sessionStorage.setItem('token', data.token);
+    sessionStorage.setItem('userEmail', adminEmail);
 
     showAlert('Organization created! Redirecting to your dashboard...', 'ok');
     setTimeout(() => window.location.href = 'dashboard.html', 1200);
@@ -193,7 +193,7 @@ async function doRegisterOrg() {
 }
 
 // Redirect if already logged in
-if (localStorage.getItem('token')) window.location.href = 'dashboard.html';
+if (sessionStorage.getItem('token')) window.location.href = 'dashboard.html';
 </script>
 </body>
 </html>
