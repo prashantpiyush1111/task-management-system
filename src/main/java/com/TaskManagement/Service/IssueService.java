@@ -13,6 +13,8 @@ import com.TaskManagement.Repository.IssueCommentRepository;
 import com.TaskManagement.Repository.IssueRepository;
 import com.TaskManagement.Repository.LabelRepository;
 import com.TaskManagement.Repository.SprintRepository;
+import com.TaskManagement.Entity.IssueStatusHistory;
+import com.TaskManagement.Repository.IssueStatusHistoryRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -26,13 +28,20 @@ public class IssueService {
 	private final LabelRepository labelRepo;
 	private final SprintRepository sprintRepo;
 	private final IssueCommentRepository commentRepo;
+	private final IssueStatusHistoryRepository statusHistoryRepo;
 
-	public IssueService(IssueRepository issueRepo, LabelRepository labelRepo, SprintRepository sprintRepo,
-			IssueCommentRepository commentRepo) {
-		this.issueRepo = issueRepo;
-		this.labelRepo = labelRepo;
-		this.sprintRepo = sprintRepo;
-		this.commentRepo = commentRepo;
+	public IssueService(
+	        IssueRepository issueRepo,
+	        LabelRepository labelRepo,
+	        SprintRepository sprintRepo,
+	        IssueCommentRepository commentRepo,
+	        IssueStatusHistoryRepository statusHistoryRepo) {
+
+	    this.issueRepo = issueRepo;
+	    this.labelRepo = labelRepo;
+	    this.sprintRepo = sprintRepo;
+	    this.commentRepo = commentRepo;
+	    this.statusHistoryRepo = statusHistoryRepo;
 	}
 
 	private String generateKey(Long id) {
@@ -100,18 +109,40 @@ public class IssueService {
 	}
 
 	@Transactional
-	public IssueDTO updateIssueStatus(Long id, IssueStatus status, String performedBy, Long organizationId) {
+	public IssueDTO updateIssueStatus(
+	        Long id,
+	        IssueStatus status,
+	        String performedBy,
+	        Long organizationId) {
 
-		Issue issue = getOwnedIssue(id, organizationId);
+	    Issue issue = getOwnedIssue(id, organizationId);
 
-		if (status == null) {
-			throw new RuntimeException("Status cannot be null");
-		}
+	    if (status == null) {
+	        throw new RuntimeException("Status cannot be null");
+	    }
 
-		issue.setIssueStatus(status);
-		issue.setUpdatedAt(java.time.LocalDateTime.now());
-		issueRepo.save(issue);
-		return toDTO(issue);
+	    IssueStatus oldStatus = issue.getIssueStatus();
+
+	    // Status history save only when status actually changes
+	    if (oldStatus != status) {
+
+	        IssueStatusHistory history = new IssueStatusHistory();
+
+	        history.setIssueId(issue.getId());
+	        history.setOldStatus(oldStatus);
+	        history.setNewStatus(status);
+	        history.setChangedBy(performedBy);
+	        history.setChangedAt(java.time.LocalDateTime.now());
+
+	        statusHistoryRepo.save(history);
+	    }
+
+	    issue.setIssueStatus(status);
+	    issue.setUpdatedAt(java.time.LocalDateTime.now());
+
+	    issueRepo.save(issue);
+
+	    return toDTO(issue);
 	}
 
 	public List<IssueDTO> search(Map<String, String> filters, Long organizationId) {

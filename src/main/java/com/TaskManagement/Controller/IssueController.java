@@ -3,8 +3,13 @@ package com.TaskManagement.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.*;
+import com.TaskManagement.Entity.IssueStatusHistory;
+import com.TaskManagement.Repository.IssueStatusHistoryRepository;
 
 import com.TaskManagement.DTO.IssueDTO;
 import com.TaskManagement.Entity.IssueComment;
@@ -25,6 +30,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class IssueController {
 	private final IssueService issueService;
+	@Autowired
+	private IssueStatusHistoryRepository statusHistoryRepo;
 
 	@Autowired
 	private UserAuthRepository userAuthRepository;
@@ -80,12 +87,34 @@ public class IssueController {
 		Long organizationId = resolveOrganizationId(authentication);
 		return ResponseEntity.ok(issueService.createSprint(sprint, organizationId));
 	}
-
 	@GetMapping("/search")
-	public ResponseEntity<List<IssueDTO>> search(@RequestParam(required = false) Map<String, String> allRequestParams,
-			Authentication authentication) {
-	    if (allRequestParams == null) allRequestParams = new HashMap<>();
+	public ResponseEntity<List<IssueDTO>> search(
+	        @RequestParam(required = false) Map<String, String> allRequestParams,
+	        Authentication authentication) {
+
+	    if (allRequestParams == null) {
+	        allRequestParams = new HashMap<>();
+	    }
+
 	    Long organizationId = resolveOrganizationId(authentication);
-	    return ResponseEntity.ok(issueService.search(allRequestParams, organizationId));
+
+	    return ResponseEntity.ok(
+	            issueService.search(allRequestParams, organizationId)
+	    );
+	}
+
+	@GetMapping("/{id}/status-history")
+	public ResponseEntity<List<IssueStatusHistory>> getStatusHistory(
+	        @PathVariable Long id,
+	        Authentication authentication) {
+
+	    Long organizationId = resolveOrganizationId(authentication);
+
+	    // Issue ownership verify
+	    issueService.getById(id, organizationId);
+
+	    return ResponseEntity.ok(
+	            statusHistoryRepo.findByIssueIdOrderByChangedAtDesc(id)
+	    );
 	}
 }

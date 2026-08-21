@@ -343,9 +343,17 @@ async function openDetail(id){
     const res=await fetch(API+'/api/issues/'+id,{headers});
     if(!res.ok)return;
     const i=await res.json();
+	const historyRes = await fetch(
+	  API + '/api/issues/' + id + '/status-history',
+	  { headers }
+	);
+
+	const statusHistory = historyRes.ok
+	  ? await historyRes.json()
+	  : [];
     document.getElementById('detailPanel').innerHTML=`
       <div class="det-head">
-        <div><div class="det-key">${i.issueKey||key}</div><div class="det-title">${i.issueTitle||'Untitled'}</div></div>
+        <div><div class="det-key">${i.issueKey||'—'}</div><div class="det-title">${i.issueTitle||'Untitled'}</div></div>
         <button class="mx" onclick="closeDetail()">✕</button>
       </div>
       <div class="det-grid">
@@ -389,11 +397,52 @@ async function openDetail(id){
           ${['OPEN','TODO','IN_PROGRESS','IN_REVIEW','DONE','BLOCKED','CLOSED'].map(s=>`<option value="${s}" ${i.issueStatus===s?'selected':''}>${s}</option>`).join('')}
         </select>
       </div>
+	  <div class="det-section">
+	    <div class="det-label">Status History</div>
+
+	    <div id="statusHistory">
+	      ${
+	        statusHistory.length
+	          ? statusHistory.map(h => `
+	              <div style="
+	                background:var(--card);
+	                border:1px solid var(--border);
+	                border-radius:8px;
+	                padding:10px 12px;
+	                margin-bottom:8px;
+	              ">
+	                <div style="font-size:12px;font-weight:600;">
+	                  ${h.oldStatus} → ${h.newStatus}
+	                </div>
+
+	                <div style="
+	                  font-size:11px;
+	                  color:var(--muted);
+	                  margin-top:5px;
+	                ">
+	                  Changed by: ${escapeHtml(h.changedBy || 'Unknown')}
+	                </div>
+
+	                <div style="
+	                  font-size:11px;
+	                  color:var(--muted);
+	                  margin-top:3px;
+	                ">
+	                  ${h.changedAt
+	                    ? new Date(h.changedAt).toLocaleString()
+	                    : 'Unknown time'}
+	                </div>
+	              </div>
+	            `).join('')
+	          : '<div style="font-size:12px;color:var(--muted)">No status changes yet.</div>'
+	      }
+	    </div>
+	  </div>
       <div class="det-section">
         <div class="det-label">Add Comment</div>
         <div class="add-comment"><textarea id="commentText" placeholder="Write a comment..."></textarea></div>
         <div style="display:flex;justify-content:flex-end;margin-top:8px">
-          <button class="mbtn primary" onclick="addComment(${i.id})"" style="padding:8px 18px;font-size:13px">Post Comment</button>
+          <button class="mbtn primary" onclick="addComment(${i.id})" style="padding:8px 18px;font-size:13px">Post Comment</button>
         </div>
       </div>`;
 	  loadAttachments(i.id);
