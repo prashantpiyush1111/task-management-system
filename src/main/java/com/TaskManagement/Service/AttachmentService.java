@@ -34,7 +34,8 @@ public class AttachmentService {
 			attach.setUplodedBy(uploadedBy);
 			return attachmentRepo.save(attach);
 		} catch (Exception e) {
-			throw new RuntimeException("Cloud upload failed");
+		    e.printStackTrace();
+		    throw new RuntimeException("Cloud upload failed: " + e.getMessage(), e);
 		}
 	}
 	private void validateFile(MultipartFile file) {

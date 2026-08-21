@@ -45,3 +45,4 @@ application.properties
 
 # Node
 node_modules/
+/.apt_generated_tests/

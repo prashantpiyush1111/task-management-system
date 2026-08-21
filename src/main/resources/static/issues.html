@@ -113,6 +113,75 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .add-comment{display:flex;gap:10px;margin-top:14px}
 .add-comment textarea{flex:1;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;resize:none;min-height:70px}
 .add-comment textarea:focus{border-color:var(--accent)}
+.attachments-box{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px;
+}
+
+.attachment-upload{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    margin-bottom:12px;
+}
+
+.attachment-upload input[type="file"]{
+    padding:7px;
+    font-size:12px;
+}
+
+.attachment-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:9px 10px;
+    background:var(--card2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin-top:7px;
+}
+
+.attachment-name{
+    font-size:12px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.attachment-actions{
+    display:flex;
+    gap:6px;
+    flex-shrink:0;
+}
+
+.attachment-btn{
+    border:1px solid var(--border);
+    background:transparent;
+    color:var(--muted);
+    border-radius:6px;
+    padding:5px 8px;
+    cursor:pointer;
+    font-size:11px;
+}
+
+.attachment-btn:hover{
+    border-color:var(--accent);
+    color:var(--accent);
+}
+
+.attachment-btn.delete:hover{
+    border-color:var(--danger);
+    color:var(--danger);
+}
+
+.upload-msg{
+    font-size:11px;
+    color:var(--muted);
+    margin-top:6px;
+}
 </style>
 </head>
 <body>
@@ -288,6 +357,32 @@ async function openDetail(id){
         <div><div class="det-label">Sprint</div><div class="det-val">${i.sprintId||'No Sprint'}</div></div>
       </div>
       <div class="det-section"><div class="det-label">Description</div><div class="det-val" style="line-height:1.6;color:#d1d5db">${i.issueDescription||'No description'}</div></div>
+	  <div class="det-section">
+	      <div class="det-label">Attachments</div>
+
+	      <div class="attachments-box">
+
+	          <div class="attachment-upload">
+	              <input type="file" id="attachmentFile"
+	                     accept=".png,.jpg,.jpeg,.pdf,.txt"/>
+
+	              <button class="mbtn primary"
+	                      onclick="uploadAttachment(${i.id})"
+	                      style="padding:8px 14px;font-size:12px">
+	                  Upload
+	              </button>
+	          </div>
+
+	          <div id="uploadMsg" class="upload-msg"></div>
+
+	          <div id="attachmentList">
+	              <div style="font-size:12px;color:var(--muted)">
+	                  No new attachments.
+	              </div>
+	          </div>
+
+	      </div>
+	  </div>
       <div class="det-section">
         <div class="det-label">Update Status</div>
         <select onchange="updateStatus(${i.id}, this.value)" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;width:100%">
@@ -318,6 +413,201 @@ async function addComment(key){
     await fetch(`${API}/api/issues/${key}/comment`,{method:'POST',headers,body:JSON.stringify({body,authorEmail:email})});
     document.getElementById('commentText').value='';
   }catch(e){}
+}
+async function uploadAttachment(issueId){
+
+    const input = document.getElementById('attachmentFile');
+    const msg = document.getElementById('uploadMsg');
+
+    if(!input || !input.files.length){
+        msg.textContent = 'Please select a file.';
+        msg.style.color = 'var(--danger)';
+        return;
+    }
+
+    const file = input.files[0];
+
+    if(file.size > 5 * 1024 * 1024){
+        msg.textContent = 'Maximum file size is 5MB.';
+        msg.style.color = 'var(--danger)';
+        return;
+    }
+
+    const allowed = [
+        'image/png',
+        'image/jpeg',
+        'application/pdf',
+        'text/plain'
+    ];
+
+    if(!allowed.includes(file.type)){
+        msg.textContent = 'Only PNG, JPEG, PDF and TXT files are allowed.';
+        msg.style.color = 'var(--danger)';
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try{
+
+        msg.textContent = 'Uploading...';
+        msg.style.color = 'var(--muted)';
+
+        const res = await fetch(
+            API + '/api/attachments/upload/' + issueId,
+            {
+                method:'POST',
+                headers:{
+                    'Authorization':'Bearer ' + token
+                },
+                body:formData
+            }
+        );
+
+        if(!res.ok){
+            const errorText = await res.text();
+            throw new Error(errorText || 'Upload failed');
+        }
+
+        const attachment = await res.json();
+
+        msg.textContent = 'File uploaded successfully.';
+        msg.style.color = 'var(--success)';
+
+        input.value = '';
+
+        addAttachmentToUI(attachment);
+
+    }catch(e){
+
+        console.error(e);
+
+        msg.textContent = e.message || 'Upload failed.';
+        msg.style.color = 'var(--danger)';
+    }
+}
+
+
+function addAttachmentToUI(attachment){
+
+    const list = document.getElementById('attachmentList');
+
+    if(!list) return;
+
+    const id = attachment.id;
+    const fileName = attachment.fileName || 'Attachment';
+    const fileSize = attachment.fileSize
+        ? formatFileSize(attachment.fileSize)
+        : '';
+
+    if(list.innerHTML.includes('No new attachments')){
+        list.innerHTML = '';
+    }
+
+    const item = document.createElement('div');
+
+    item.className = 'attachment-item';
+
+    item.id = 'attachment-' + id;
+
+    item.innerHTML = `
+        <div class="attachment-name">
+            📎 ${escapeHtml(fileName)}
+            <span style="color:var(--muted);margin-left:6px">
+                ${fileSize}
+            </span>
+        </div>
+
+        <div class="attachment-actions">
+
+            <button class="attachment-btn"
+                    onclick="downloadAttachment(${id})">
+                Download
+            </button>
+
+            <button class="attachment-btn delete"
+                    onclick="deleteAttachment(${id})">
+                Delete
+            </button>
+
+        </div>
+    `;
+
+    list.appendChild(item);
+}
+
+
+function downloadAttachment(id){
+
+    window.open(
+        API + '/api/attachments/download/stream/' + id,
+        '_blank'
+    );
+}
+
+
+async function deleteAttachment(id){
+
+    if(!confirm('Delete this attachment?')){
+        return;
+    }
+
+    try{
+
+        const res = await fetch(
+            API + '/api/attachments/delete/' + id,
+            {
+                method:'DELETE',
+                headers:{
+                    'Authorization':'Bearer ' + token
+                }
+            }
+        );
+
+        if(!res.ok){
+            throw new Error('Delete failed');
+        }
+
+        const item = document.getElementById(
+            'attachment-' + id
+        );
+
+        if(item){
+            item.remove();
+        }
+
+    }catch(e){
+
+        console.error(e);
+
+        alert('Failed to delete attachment.');
+    }
+}
+
+
+function formatFileSize(bytes){
+
+    if(bytes < 1024){
+        return bytes + ' B';
+    }
+
+    if(bytes < 1024 * 1024){
+        return (bytes / 1024).toFixed(1) + ' KB';
+    }
+
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+
+function escapeHtml(value){
+
+    return String(value)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#039;');
 }
 function openCreate(){document.getElementById('createOverlay').classList.add('show');}
 function closeCreate(){document.getElementById('createOverlay').classList.remove('show');}
