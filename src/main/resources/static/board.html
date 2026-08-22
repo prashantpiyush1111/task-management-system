@@ -214,7 +214,7 @@ async function loadBoard(){
   const cont=document.getElementById('columnsContainer');
   cont.innerHTML='<div class="board-placeholder"><div class="board-placeholder-icon">⏳</div><div>Loading board...</div></div>';
   try{
-    const res=await fetch(`${API}/api/boards/${boardId}/column`,{headers});
+    const res=await fetch(`${API}/api/boards/${boardId}/columns`,{headers});
     if(!res.ok)throw new Error('Board not found');
     columnsData=await res.json();
     if(!columnsData.length){cont.innerHTML='<div class="board-placeholder"><div class="board-placeholder-icon">🗂</div><div>No columns yet. Add a column to start.</div></div>';return;}
@@ -270,7 +270,7 @@ async function dropCard(e,colId){
 
 async function doAddColumn(){
   try{
-    const res=await fetch(`${API}/api/boards/${boardId}/columns`,{method:'POST',headers,body:JSON.stringify({
+    const res=await fetch(`${API}/api/boards/${boardId}/column`,{method:'POST',headers,body:JSON.stringify({
       name:document.getElementById('colName').value,
       wipLimit:parseInt(document.getElementById('colWip').value)||0,
       statusKey:document.getElementById('colStatus').value,
