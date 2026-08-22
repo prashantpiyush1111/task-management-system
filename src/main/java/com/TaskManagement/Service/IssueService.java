@@ -61,6 +61,7 @@ public class IssueService {
 		issue.setReporterEmail(dto.getReporterEmail());
 		issue.setPriority(dto.getPriority());
 		issue.setDueDate(dto.getDueDate());
+		issue.setProjectId(dto.getProjectId());
 
 		issue.setIssueKey("TEMP-" + UUID.randomUUID());
 
@@ -199,6 +200,9 @@ public class IssueService {
 		dto.setDueDate(issue.getDueDate());
 		dto.setCreatedAt(issue.getCreatedAt());
 		dto.setUpdatedAt(issue.getUpdatedAt());
+		dto.setProjectId(issue.getProjectId());
+		dto.setSprintId(issue.getSprintId());
+		dto.setEpicId(issue.getEpicId());
 		if (issue.getLabels() != null) {
 			dto.setLabels(issue.getLabels().stream().map(Label::getName).collect(Collectors.toSet()));
 		}

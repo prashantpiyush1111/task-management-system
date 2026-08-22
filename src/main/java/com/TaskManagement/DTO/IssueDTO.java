@@ -25,6 +25,7 @@ public class IssueDTO {
 
 	public String assigneeEmail;
 	public String reporterEmail;
+	public Long projectId;
 
 	public Long epicId;
 	public Long sprintId;
