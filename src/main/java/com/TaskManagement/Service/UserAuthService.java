@@ -118,18 +118,14 @@ public class UserAuthService {
 
 	public void forgotPassword(String userOfficialEmail) {
 
-		UserAuth user = userAuthRepo
-				.findByUserOfficialEmail(userOfficialEmail)
-				.orElseThrow(() -> new RuntimeException("User not found"));
-
-		String token = UUID.randomUUID().toString();
-
-		user.setResetToken(token);
-		user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(10));
-
-		userAuthRepo.save(user);
-
-		emailService.sendResetPassword(userOfficialEmail, token);
+	    userAuthRepo.findByUserOfficialEmail(userOfficialEmail)
+	        .ifPresent(user -> {
+	            String token = UUID.randomUUID().toString();
+	            user.setResetToken(token);
+	            user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(10));
+	            userAuthRepo.save(user);
+	            emailService.sendResetPassword(userOfficialEmail, token);
+	        });
 	}
 
 	public void resetPassword(String token, String newPassword) {

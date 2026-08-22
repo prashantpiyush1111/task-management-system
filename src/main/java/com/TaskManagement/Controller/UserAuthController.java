@@ -32,10 +32,8 @@ public class UserAuthController {
 
 	@PostMapping("/forgot-password")
 	public ResponseEntity<String> forgotPassword(@RequestParam String userOfficialEmail) {
-
-		userAuthService.forgotPassword(userOfficialEmail);
-
-		return ResponseEntity.ok("Reset email sent successfully");
+	    userAuthService.forgotPassword(userOfficialEmail);
+	    return ResponseEntity.ok("If this email is registered, a reset link has been sent.");
 	}
 
 	@PostMapping("/reset-password")
