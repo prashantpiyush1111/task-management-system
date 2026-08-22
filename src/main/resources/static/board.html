@@ -52,6 +52,18 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--tex
 .col-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .col-name{font-size:13px;font-weight:700;letter-spacing:-.2px}
 .col-count{background:var(--card2);color:var(--muted);font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;font-family:'JetBrains Mono',monospace}
+.delete-col-btn{
+  background:transparent;
+  border:none;
+  color:var(--muted);
+  font-size:14px;
+  cursor:pointer;
+  padding:2px 4px;
+}
+
+.delete-col-btn:hover{
+  color:var(--danger);
+}
 .col-wip{font-size:11px;color:var(--warning)}
 .cards-list{padding:12px;overflow-y:auto;flex:1;min-height:100px}
 .issue-card{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:13px;margin-bottom:9px;cursor:pointer;transition:all .2s;user-select:none}
@@ -233,10 +245,21 @@ function buildColumn(col,cards){
   div.dataset.colId=col.id;
   const wipStr=col.wipLimit&&col.wipLimit>0?`<span class="col-wip">WIP: ${col.wipLimit}</span>`:'';
   div.innerHTML=`
-    <div class="col-header">
-      <div class="col-name">${col.name||'Column'}</div>
-      <div style="display:flex;align-items:center;gap:8px">${wipStr}<span class="col-count">${cards.length}</span></div>
+  <div class="col-header">
+
+    <div class="col-name">${col.name||'Column'}</div>
+
+    <div style="display:flex;align-items:center;gap:8px">
+      ${wipStr}
+      <span class="col-count">${cards.length}</span>
+      <button class="delete-col-btn"
+              title="Delete Column"
+              onclick="deleteColumn(${col.id}, '${(col.name || 'Column').replace(/'/g, "\\'")}')">
+        🗑
+      </button>
     </div>
+
+  </div>
     <div class="cards-list" id="cards-${col.id}" ondragover="allowDrop(event)" ondrop="dropCard(event,${col.id})">
       ${cards.length?cards.map(c=>cardHTML(c)).join(''):'<div class="empty-col">No cards</div>'}
     </div>
@@ -289,6 +312,34 @@ async function doAddCard(){
     if(!res.ok)throw new Error('Failed');
     closeModal('addCardOverlay');loadBoard();
   }catch(e){alert('Failed to add card');}
+}
+async function deleteColumn(columnId, columnName){
+
+  if(!confirm(`Delete column "${columnName}"? All cards in this column will also be deleted.`)){
+    return;
+  }
+
+  try{
+
+    const res = await fetch(
+      `${API}/api/boards/${boardId}/column/${columnId}`,
+      {
+        method:'DELETE',
+        headers
+      }
+    );
+
+    if(!res.ok){
+      throw new Error('Failed to delete column');
+    }
+
+    loadBoard();
+
+  }catch(e){
+
+    alert('Failed to delete column');
+
+  }
 }
 </script>
 </body>

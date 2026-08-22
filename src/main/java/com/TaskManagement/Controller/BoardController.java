@@ -74,6 +74,21 @@ public class BoardController {
 	    return ResponseEntity.ok(boardService.addColumn(column));
 	}
 	
+	@DeleteMapping("/{boardId}/column/{columnId}")
+	public ResponseEntity<Void> deleteColumn(
+	        @PathVariable Long boardId,
+	        @PathVariable Long columnId,
+	        Authentication authentication) {
+
+	    boardService.deleteColumn(
+	            boardId,
+	            columnId,
+	            resolveOrganizationId(authentication)
+	    );
+
+	    return ResponseEntity.noContent().build();
+	}
+	
 	@PutMapping("/{boardId}/card/{cardId}/move")
 	public ResponseEntity<Void> moveCard(
 	        @PathVariable Long boardId,

@@ -167,4 +167,21 @@ public class BoardService {
 	public BoardColumn addColumn(BoardColumn column) {
 	    return boardColumnRepo.save(column);
 	}
+	@Transactional
+	public void deleteColumn(Long boardId, Long columnId, Long organizationId) {
+
+	    BoardColumn column = boardColumnRepo.findById(columnId)
+	            .orElseThrow(() -> new RuntimeException("Column not found"));
+
+	    if (!column.getBoard().getId().equals(boardId)) {
+	        throw new RuntimeException("Column does not belong to this board");
+	    }
+
+	    List<BoardCard> cards =
+	            boardCardRepo.findByBoardIdAndColumnIdOrderByPosition(boardId, columnId);
+
+	    boardCardRepo.deleteAll(cards);
+
+	    boardColumnRepo.delete(column);
+	}
 }
