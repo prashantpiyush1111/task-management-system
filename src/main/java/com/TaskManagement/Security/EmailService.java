@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-
+import org.springframework.scheduling.annotation.Async;
 @Service
 public class EmailService {
 
@@ -17,8 +17,8 @@ public class EmailService {
 
 	@Value("${app.base-url:http://localhost:9999}")
 	private String baseUrl;
-
-	public void sendResetPassword(String to, String token) {
+	 @Async
+	 public void sendResetPassword(String to, String token) {
 
 		String resetLink = baseUrl + "/reset-password.html?token=" + token;
 
