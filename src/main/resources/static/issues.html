@@ -264,6 +264,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
     <div class="modal-head"><div class="modal-title">Create Issue</div><button class="mx" onclick="closeCreate()">✕</button></div>
     <div class="alert err" id="createAlert"></div>
     <div class="fg"><label>Title *</label><input type="text" id="ciTitle" placeholder="Issue title"/></div>
+	<div class="fg"><label>Project ID *</label><input type="number" id="ciProjectId" placeholder="Project ID"/></div>
     <div class="fg"><label>Description</label><textarea id="ciDesc" placeholder="Describe the issue..."></textarea></div>
     <div class="frow">
       <div class="fg"><label>Type</label><select id="ciType"><option value="TASK">Task</option><option value="BUG">Bug</option><option value="STORY">Story</option><option value="EPIC">Epic</option><option value="SUB_TASK">Sub-task</option></select></div>
@@ -742,12 +743,15 @@ function openCreate(){document.getElementById('createOverlay').classList.add('sh
 function closeCreate(){document.getElementById('createOverlay').classList.remove('show');}
 async function doCreate(){
   const title=document.getElementById('ciTitle').value.trim();
+  const projectId=document.getElementById('ciProjectId').value;
   if(!title){showCAlert('Title required');return;}
+  if(!projectId){showCAlert('Project ID required');return;}
   try{
     const res=await fetch(API+'/api/issues/createIssue',{method:'POST',headers,body:JSON.stringify({
       issueTitle:title,issueDescription:document.getElementById('ciDesc').value,
       issueType:document.getElementById('ciType').value,priority:document.getElementById('ciPri').value,
-      assigneeEmail:document.getElementById('ciAssignee').value||null,reporterEmail:email,issueStatus:'OPEN'
+      assigneeEmail:document.getElementById('ciAssignee').value||null,reporterEmail:email,issueStatus:'OPEN',
+      projectId:Number(projectId)
     })});
     if(!res.ok)throw new Error('Failed');
     closeCreate();loadIssues();
