@@ -11,7 +11,7 @@ import com.TaskManagement.Enum.UserStatus;
 @Repository
 public interface UserAuthRepository extends JpaRepository<UserAuth, Long> {
 
-	Optional<UserAuth> findByUserOfficialEmail(String userOfficialEmail);
+	Optional<UserAuth> findByUserOfficialEmailIgnoreCase(String userOfficialEmail);
 
 	Optional<UserAuth> findByResetToken(String resetToken);
 

@@ -88,7 +88,7 @@ public class AdminService {
 	 */
 	private Long resolveAdminOrganizationId(String adminEmail) {
 
-		UserAuth admin = userAuthRepository.findByUserOfficialEmail(adminEmail)
+		UserAuth admin = userAuthRepository.findByUserOfficialEmailIgnoreCase(adminEmail)
 				.orElseThrow(() -> new RuntimeException("Admin account not found"));
 
 		if (admin.getRole() != Role.ADMIN) {

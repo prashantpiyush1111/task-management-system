@@ -28,7 +28,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String userOfficialEmail) throws UsernameNotFoundException {
 
-		UserAuth user = userRepo.findByUserOfficialEmail(userOfficialEmail)
+		UserAuth user = userRepo.findByUserOfficialEmailIgnoreCase(userOfficialEmail)
 				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
 		Set<Permission> permissions = RolebasedPermissionConfig.getrole_permission().get(user.getRole());

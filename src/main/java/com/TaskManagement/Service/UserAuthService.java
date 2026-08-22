@@ -47,7 +47,7 @@ public class UserAuthService {
 	public AuthResponseDTO register(RegisterRequestDTO register) {
 
 		Optional<UserAuth> existing = userAuthRepo
-				.findByUserOfficialEmail(register.getUserOfficialEmail());
+				.findByUserOfficialEmailIgnoreCase(register.getUserOfficialEmail());
 
 		if (existing.isPresent()) {
 			throw new RuntimeException("User already exists");
@@ -93,7 +93,7 @@ public class UserAuthService {
 	public AuthResponseDTO login(LoginRequestDTO login) {
 
 		UserAuth user = userAuthRepo
-				.findByUserOfficialEmail(login.getUserOfficialEmail())
+				.findByUserOfficialEmailIgnoreCase(login.getUserOfficialEmail())
 				.orElseThrow(() -> new RuntimeException("User not found"));
 
 		if (!passwordEncoder.matches(login.getPassword(), user.getPassword())) {
@@ -118,7 +118,7 @@ public class UserAuthService {
 
 	public void forgotPassword(String userOfficialEmail) {
 
-	    userAuthRepo.findByUserOfficialEmail(userOfficialEmail)
+	    userAuthRepo.findByUserOfficialEmailIgnoreCase(userOfficialEmail)
 	        .ifPresent(user -> {
 	            String token = UUID.randomUUID().toString();
 	            user.setResetToken(token);

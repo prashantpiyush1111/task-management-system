@@ -10,6 +10,6 @@ import com.TaskManagement.Entity.UserProfileUpdate;
 @Repository
 public interface UserProfileUpdateRepository extends JpaRepository<UserProfileUpdate, Long> {
 
-	Optional<UserProfileUpdate> findByUserOfficialEmail(String userOfficialEmail);
+	Optional<UserProfileUpdate> findByUserOfficialEmailIgnoreCase(String userOfficialEmail);
 
 }

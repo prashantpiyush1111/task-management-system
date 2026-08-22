@@ -26,7 +26,7 @@ public class UserProfileUpdateService {
 			Long organizationId) {
 
 		UserProfileUpdate user = userProfileRepo
-				.findByUserOfficialEmail(userOfficialEmail)
+				.findByUserOfficialEmailIgnoreCase(userOfficialEmail)
 				.orElseGet(() -> createMissingProfile(
 						userOfficialEmail,
 						organizationId));
@@ -55,7 +55,7 @@ public class UserProfileUpdateService {
 			Long organizationId) {
 
 		UserProfileUpdate user = userProfileRepo
-				.findByUserOfficialEmail(userOfficialEmail)
+				.findByUserOfficialEmailIgnoreCase(userOfficialEmail)
 				.orElseGet(() -> createMissingProfile(
 						userOfficialEmail,
 						organizationId));
@@ -72,7 +72,7 @@ public class UserProfileUpdateService {
 			Long organizationId) {
 
 		UserAuth userAuth = userAuthRepo
-				.findByUserOfficialEmail(userOfficialEmail)
+				.findByUserOfficialEmailIgnoreCase(userOfficialEmail)
 				.orElseThrow(() -> new RuntimeException("User not Found"));
 
 		if (userAuth.getOrganization() == null

@@ -50,7 +50,7 @@ public class OrganizationService {
 			throw new RuntimeException("Organization email already exists");
 		}
 
-		if (userAuthRepository.findByUserOfficialEmail(request.getAdminEmail()).isPresent()) {
+		if (userAuthRepository.findByUserOfficialEmailIgnoreCase(request.getAdminEmail()).isPresent()) {
 			throw new RuntimeException("User already exists");
 		}
 

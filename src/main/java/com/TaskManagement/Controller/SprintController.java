@@ -23,7 +23,7 @@ public class SprintController {
 	private UserAuthRepository userAuthRepository;
 
 	private Long resolveOrganizationId(Authentication authentication) {
-		UserAuth user = userAuthRepository.findByUserOfficialEmail(authentication.getName())
+		UserAuth user = userAuthRepository.findByUserOfficialEmailIgnoreCase(authentication.getName())
 				.orElseThrow(() -> new RuntimeException("User not found"));
 		return user.getOrganization().getId();
 	}
