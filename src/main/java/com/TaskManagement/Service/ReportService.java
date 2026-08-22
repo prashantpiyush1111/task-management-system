@@ -61,7 +61,7 @@ public class ReportService {
 
 		List<Sprint> completed = sprintRepo.findByProjectId(projectId).stream()
 				.filter(s -> organizationId.equals(s.getOrganizationId()))
-				.filter(s -> s.getState() == SprintState.COMPLETED).collect(Collectors.toList());
+				.filter(s -> s.getSprintState() == SprintState.COMPLETED).collect(Collectors.toList());
 
 		Map<String, Integer> velocity = new LinkedHashMap<>();
 		for (Sprint s : completed) {
