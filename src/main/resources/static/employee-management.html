@@ -554,6 +554,12 @@ tbody tr:hover{
   color:#f87171
 }
 
+.badge.status-inactive{
+  background:rgba(239,68,68,.15);
+  color:#f87171;
+  border:1px solid rgba(239,68,68,.3)
+}
+
 .actions{
   display:flex;
   gap:8px
@@ -594,8 +600,6 @@ tbody tr:hover{
   background:rgba(239,68,68,.2)
 }
 
-/* NEW: Remove button */
-
 .abtn.remove{
   background:rgba(239,68,68,.1);
   color:#f87171;
@@ -605,6 +609,16 @@ tbody tr:hover{
 .abtn.remove:hover{
   background:rgba(239,68,68,.22);
   border-color:rgba(239,68,68,.5)
+}
+
+.abtn.activate{
+  background:rgba(34,197,94,.12);
+  color:#4ade80;
+  border-color:rgba(34,197,94,.3)
+}
+
+.abtn.activate:hover{
+  background:rgba(34,197,94,.22)
 }
 
 .abtn:disabled{
@@ -1007,9 +1021,6 @@ function closeSidebar(){
 }
 
 
-// Decode role from JWT payload for UI purposes only.
-// Server-side authorization is the real enforcement.
-
 function getRoleFromToken() {
 
   try {
@@ -1203,7 +1214,7 @@ function renderList() {
                   )
                 : (
                     activeUsers.length === 0
-                      ? 'No active members found'
+                      ? 'No active or inactive members found'
                       : 'No matches for your search'
                   )
             }
@@ -1306,75 +1317,87 @@ function renderList() {
 
 
   /* =========================================================
-     ACTIVE MEMBERS
+     ACTIVE & INACTIVE MEMBERS
      ========================================================= */
 
   body.innerHTML =
-    filtered.map(u => `
+    filtered.map(u => {
+      const isInactive = u.status === 'INACTIVE';
 
-      <tr id="active-row-${u.id}">
+      return `
+        <tr id="active-row-${u.id}">
 
-        <td>
+          <td>
 
-          <div class="person">
+            <div class="person">
 
-            <div class="p-av">
-              ${initials(u.userName, u.userOfficialEmail)}
-            </div>
-
-            <div>
-
-              <div class="p-name">
-                ${u.userName || 'Unnamed'}
+              <div class="p-av">
+                ${initials(u.userName, u.userOfficialEmail)}
               </div>
 
-              <div class="p-email">
-                ${u.userOfficialEmail || ''}
+              <div>
+
+                <div class="p-name">
+                  ${u.userName || 'Unnamed'}
+                </div>
+
+                <div class="p-email">
+                  ${u.userOfficialEmail || ''}
+                </div>
+
               </div>
 
             </div>
 
-          </div>
-
-        </td>
+          </td>
 
 
-        <td>
-          <span class="badge role">
-            ${u.role || '—'}
-          </span>
-        </td>
+          <td>
+            <span class="badge role">
+              ${u.role || '—'}
+            </span>
+          </td>
 
 
-        <td>
-          <span class="badge status-active">
-            ${u.status || 'ACTIVE'}
-          </span>
-        </td>
+          <td>
+            <span class="badge ${isInactive ? 'status-inactive' : 'status-active'}">
+              ${u.status || 'ACTIVE'}
+            </span>
+          </td>
 
 
-        <td>
+          <td>
 
-          <div
-            class="actions"
-            style="justify-content:flex-end"
-          >
-
-            <button
-              class="abtn remove"
-              onclick="removeMember(${u.id})"
-              ${!isAdmin ? 'disabled' : ''}
+            <div
+              class="actions"
+              style="justify-content:flex-end"
             >
-              🗑 Remove
-            </button>
 
-          </div>
+              ${
+                isInactive
+                ? `<button
+                    class="abtn activate"
+                    onclick="activateMember(${u.id})"
+                    ${!isAdmin ? 'disabled' : ''}
+                   >
+                     ↻ Reactivate
+                   </button>`
+                : `<button
+                    class="abtn remove"
+                    onclick="removeMember(${u.id})"
+                    ${!isAdmin ? 'disabled' : ''}
+                   >
+                     🗑 Remove
+                   </button>`
+              }
 
-        </td>
+            </div>
 
-      </tr>
+          </td>
 
-    `).join('');
+        </tr>
+      `;
+    }).join('');
 
 }
 
@@ -1441,7 +1464,7 @@ async function loadPendingUsers() {
 
 
 /* =========================================================
-   LOAD ACTIVE USERS
+   LOAD ACTIVE & INACTIVE USERS
    ========================================================= */
 
 async function loadActiveUsers() {
@@ -1622,7 +1645,7 @@ async function decide(userId, action) {
 
 
 /* =========================================================
-   REMOVE ACTIVE MEMBER
+   DEACTIVATE (REMOVE) ACTIVE MEMBER
    ========================================================= */
 
 async function removeMember(userId) {
@@ -1646,7 +1669,7 @@ async function removeMember(userId) {
 
   const confirmed =
     confirm(
-      `Are you sure you want to remove ${memberName} from the team?`
+      `Are you sure you want to deactivate ${memberName}? The user data will remain saved.`
     );
 
 
@@ -1715,23 +1738,163 @@ async function removeMember(userId) {
       throw new Error(
         d.message ||
         d.error ||
-        'Failed to remove member'
+        'Failed to deactivate member'
       );
 
     }
 
 
-    activeUsers =
-      activeUsers.filter(
-        u => u.id !== userId
-      );
+    /* Local state status update */
+    activeUsers = activeUsers.map(u =>
+      u.id === userId ? { ...u, status: 'INACTIVE' } : u
+    );
 
 
     renderList();
 
 
     showToast(
-      'Member removed successfully',
+      'Member deactivated successfully',
+      'ok'
+    );
+
+
+  } catch (e) {
+
+    showToast(
+      e.message,
+      'err'
+    );
+
+
+    buttons.forEach(
+      b => {
+        b.disabled = false;
+      }
+    );
+
+
+    if (clickedBtn) {
+      clickedBtn.innerHTML =
+        originalHtml;
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   REACTIVATE INACTIVE MEMBER
+   ========================================================= */
+
+async function activateMember(userId) {
+
+  if (!isAdmin) {
+    return;
+  }
+
+
+  const member =
+    activeUsers.find(
+      u => u.id === userId
+    );
+
+
+  const memberName =
+    member?.userName ||
+    member?.userOfficialEmail ||
+    'this member';
+
+
+  const confirmed =
+    confirm(
+      `Are you sure you want to reactivate ${memberName}?`
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  const row =
+    document.getElementById(
+      'active-row-' + userId
+    );
+
+
+  const buttons =
+    row
+      ? row.querySelectorAll('.abtn')
+      : [];
+
+
+  buttons.forEach(
+    b => {
+      b.disabled = true;
+    }
+  );
+
+
+  const clickedBtn =
+    row
+      ? row.querySelector('.abtn.activate')
+      : null;
+
+
+  const originalHtml =
+    clickedBtn
+      ? clickedBtn.innerHTML
+      : '';
+
+
+  if (clickedBtn) {
+    clickedBtn.innerHTML =
+      '<span class="spin"></span>';
+  }
+
+
+  try {
+
+    const res =
+      await fetch(
+        API + '/api/admin/users/' + userId + '/activate',
+        {
+          method:'PUT',
+          headers
+        }
+      );
+
+
+    if (!res.ok) {
+
+      const d =
+        await res
+          .json()
+          .catch(() => ({}));
+
+
+      throw new Error(
+        d.message ||
+        d.error ||
+        'Failed to reactivate member'
+      );
+
+    }
+
+
+    /* Local state status update */
+    activeUsers = activeUsers.map(u =>
+      u.id === userId ? { ...u, status: 'ACTIVE' } : u
+    );
+
+
+    renderList();
+
+
+    showToast(
+      'Member reactivated successfully',
       'ok'
     );
 

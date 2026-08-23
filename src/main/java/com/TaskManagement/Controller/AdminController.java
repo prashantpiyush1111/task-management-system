@@ -56,4 +56,13 @@ public class AdminController {
 	            adminService.getEmployees(authentication.getName())
 	    );
 	}
+	@PutMapping("/users/{userId}/activate")
+	public ResponseEntity<String> activateUser(
+			@PathVariable Long userId,
+			Authentication authentication) {
+
+		adminService.activateUser(userId, authentication.getName());
+
+		return ResponseEntity.ok("User reactivated successfully");
+	}
 }

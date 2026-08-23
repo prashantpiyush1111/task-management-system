@@ -116,10 +116,25 @@ public class AdminService {
 
 		Long organizationId = resolveAdminOrganizationId(adminEmail);
 
-		return userAuthRepository
-				 .findByOrganizationIdAndStatus(organizationId, UserStatus.ACTIVE)
+		return userAuthRepository.findByOrganizationId(organizationId)
 				.stream()
+				.filter(user -> user.getStatus() == UserStatus.ACTIVE || user.getStatus() == UserStatus.INACTIVE)
 				.map(this::toDTO)
 				.collect(Collectors.toList());
+	}
+	public void activateUser(Long userId, String adminEmail) {
+
+		Long organizationId = resolveAdminOrganizationId(adminEmail);
+
+		UserAuth user = userAuthRepository.findById(userId)
+				.orElseThrow(() -> new RuntimeException("User not found"));
+
+		if (user.getOrganization() == null
+				|| !user.getOrganization().getId().equals(organizationId)) {
+			throw new RuntimeException("User does not belong to your organization");
+		}
+
+		user.setStatus(UserStatus.ACTIVE);
+		userAuthRepository.save(user);
 	}
 }
