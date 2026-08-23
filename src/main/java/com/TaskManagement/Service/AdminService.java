@@ -117,7 +117,7 @@ public class AdminService {
 		Long organizationId = resolveAdminOrganizationId(adminEmail);
 
 		return userAuthRepository
-				.findByOrganizationId(organizationId)
+				 .findByOrganizationIdAndStatus(organizationId, UserStatus.ACTIVE)
 				.stream()
 				.map(this::toDTO)
 				.collect(Collectors.toList());
