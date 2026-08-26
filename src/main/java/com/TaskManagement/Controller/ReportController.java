@@ -51,7 +51,7 @@ public class ReportController {
 	@GetMapping("/epicReport/{epicId}")
 	public ResponseEntity<Map<String, Object>> getEpicRepot(@PathVariable Long epicId, Authentication authentication) {
 		Long organizationId = resolveOrganizationId(authentication);
-		return ResponseEntity.ok(reportService.epicProgessReport(epicId, organizationId));
+		return ResponseEntity.ok(reportService.epicProgressReport(epicId, organizationId));
 	}
 
 	@GetMapping("/cumultaive/{sprintId}")
