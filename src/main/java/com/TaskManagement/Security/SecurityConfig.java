@@ -81,8 +81,8 @@ public class SecurityConfig {
             			    "/api/user-auth/reset-password",
             			    "/api/integration/**",
 
-            			    "/api/organizations/register",
-            			    "/api/organizations"
+            			    "/api/organizations/register"
+            			   
             			)
             			.permitAll()
 
