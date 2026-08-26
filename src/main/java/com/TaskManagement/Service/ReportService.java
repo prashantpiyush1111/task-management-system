@@ -92,9 +92,6 @@ public class ReportService {
 		return result;
 	}
 
-	public Map<String, Object> epicProgessReport(Long epicId, Long organizationId) {
-		return epicProgressReport(epicId, organizationId);
-	}
 
 	public Map<String, Object> epicProgressReport(Long epicId, Long organizationId) {
 
