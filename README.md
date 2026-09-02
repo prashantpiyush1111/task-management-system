@@ -1,236 +1,113 @@
 # 🚀 Task Management System
 
-A secure and scalable **Full Stack Task Management System** developed using **Java, Spring Boot, Spring Security, JWT, MySQL, Hibernate, HTML, CSS, and JavaScript**.
+> A secure full-stack task and issue management platform built with Java and Spring Boot for organizing work, users, workflows, sprints, and reporting.
 
-This project is designed to simplify **project coordination, issue tracking, sprint planning, workflow management, team collaboration, and reporting** in software development environments.
+## 📌 Overview
 
----
+The **Task Management System** is a full-stack application designed to support software-development-style project coordination. It brings authentication, role-based access, issue and task management, workflow tracking, sprint organization, attachments, and reporting into one application.
 
-# 📌 Project Overview
+The project uses a layered backend architecture to keep responsibilities separated and make the application easier to maintain and extend.
 
-The Task Management System provides an enterprise-level backend architecture for managing projects, issues, workflows, sprint activities, authentication, and secure API communication.
+## ✨ Highlights
 
-The application follows a modular layered architecture approach to ensure:
+| Area | Capabilities |
+|---|---|
+| 🔐 Authentication | Registration, login, JWT-based authentication, protected APIs |
+| 👥 Authorization | Role-based access control and endpoint protection |
+| 📋 Task & Issues | Create, update, assign, prioritize, and track work items |
+| 🔄 Workflow | Status management and workflow transition tracking |
+| 🏃 Sprints | Sprint creation, assignment, backlog handling, and progress tracking |
+| 📊 Reporting | Task progress, sprint reporting, and analytics-oriented views |
+| 📎 Attachments | File uploads with Cloudinary integration |
+| ✅ Validation | Input validation and global exception handling |
 
-* Scalability
-* Maintainability
-* Security
-* Separation of Concerns
-* Clean Backend Design
-
----
-
-# ✨ Features
-
-## 🔐 Authentication & Security
-
-* JWT Authentication
-* Secure Login & Registration
-* Role-Based Access Control
-* Protected REST APIs
-* Spring Security Integration
-
-## 📋 Task & Issue Management
-
-* Create Issues & Tasks
-* Update Issue Status
-* Assign Tasks to Users
-* Issue Tracking System
-* Priority Management
-
-## 📊 Workflow Management
-
-* Workflow Transition Tracking
-* Status Management
-* Task Progress Monitoring
-
-## 🏃 Sprint & Backlog Management
-
-* Sprint Creation
-* Sprint Assignment
-* Backlog Handling
-* Sprint Progress Tracking
-
-## 📌 Kanban Board
-
-* Board-Based Task Visualization
-* Drag & Drop Workflow Concept
-* Issue Status Categorization
-
-## 📁 File & Attachment Management
-
-* Cloudinary Integration
-* Secure File Upload
-* Attachment Storage
-
-## 📈 Reporting & Analytics
-
-* Task Progress Reports
-* Sprint Reports
-* User Activity Monitoring
-* Analytics Dashboard Concepts
-
-## ⚠ Validation & Exception Handling
-
-* Global Exception Handling
-* Input Validation
-* API Error Responses
-
----
-
-# 🛠 Technologies Used
-
-## Backend
-
-* Java
-* Spring Boot
-* Spring Security
-* Spring Data JPA
-* Hibernate ORM
-* Maven
-
-## Database
-
-* MySQL
-
-## Frontend
-
-* HTML
-* CSS
-* JavaScript
-
-## Security
-
-**JWT Authentication
-
-## Cloud Storage
-
-* Cloudinary
-
----
-
-# 🏗 Project Architecture
-
-The project follows a layered architecture pattern:
+## 🏗️ Architecture
 
 ```text
-Controller Layer
-       ↓
-Service Layer
-       ↓
-Repository Layer
-       ↓
-Database Layer
+Client / Frontend
+       │
+       │ HTTP / REST
+       ▼
+┌──────────────────────┐
+│ Controller Layer     │
+├──────────────────────┤
+│ Service Layer        │
+├──────────────────────┤
+│ Repository Layer     │
+├──────────────────────┤
+│ Entity / DTO Layer   │
+├──────────────────────┤
+│ Security Layer       │
+└──────────┬───────────┘
+           │
+           ▼
+      MySQL Database
 ```
 
-### Layers Used:
+## 🧱 Major Modules
 
-* Controller Layer
-* Service Layer
-* Repository Layer
-* Entity Layer
-* DTO Layer
-* Security Layer
+- **Authentication & Security** — JWT authentication, Spring Security, authorization rules
+- **User Management** — users, roles, and access control
+- **Issue Management** — task/issue lifecycle and assignment
+- **Workflow Management** — status transitions and progress flow
+- **Sprint Management** — sprint and backlog organization
+- **Kanban Board** — board-oriented task visualization
+- **Reporting** — progress and analytics capabilities
+- **Attachments** — file storage and attachment handling
 
-This architecture improves:
+## 🛠️ Tech Stack
 
-* Code Reusability
-* Scalability
-* Maintainability
-* Modular Development
+### Backend
 
----
+- Java
+- Spring Boot
+- Spring Security
+- Spring Data JPA
+- Hibernate ORM
+- Maven
 
-# 📂 Major Modules
+### Database & Storage
 
-| Module                  | Description                                  |
-| ----------------------- | -------------------------------------------- |
-| Authentication Module   | Handles login, registration & JWT validation |
-| User Management Module  | Manages users & roles                        |
-| Issue Management Module | Handles issue creation & tracking            |
-| Workflow Module         | Tracks status transitions                    |
-| Sprint Module           | Manages sprint activities                    |
-| Kanban Board Module     | Visual task organization                     |
-| Reporting Module        | Analytics & reports                          |
-| Attachment Module       | File upload & storage                        |
+- MySQL
+- Cloudinary
 
----
+### Frontend
 
-#  Security Implementation
+- HTML
+- CSS
+- JavaScript
 
-Security was implemented using:
+### Security
 
-* Spring Security
-* JWT Token Validation
-* Authentication Filters
-* Role-Based Authorization
-* Secure Endpoint Protection
+- JWT authentication
+- Role-based authorization
+- Protected REST endpoints
+- Input validation and centralized exception handling
 
-The system ensures only authorized users can access protected resources.
+## 🔗 API Areas
 
----
+The REST API is organized around the application's main domains:
 
-# 🗄 Database Design
+- Authentication
+- Users
+- Issues / Tasks
+- Workflows
+- Sprints
+- Reports
+- Attachments
 
-The application uses **MySQL Database** with proper entity relationship mapping.
+## 🚀 Getting Started
 
-## Major Entities
-
-* User
-* Role
-* Project
-* Issue
-* Sprint
-* Workflow
-* Board
-* Attachment
-* Comment
-
-## Relationships Used
-
-* One-to-Many
-* Many-to-One
-* Many-to-Many
-
----
-
-# 🔗 REST APIs
-
-RESTful APIs were implemented for:
-
-* Authentication APIs
-* User APIs
-* Issue APIs
-* Workflow APIs
-* Sprint APIs
-* Reporting APIs
-* Attachment APIs
-
----
-
-# ⚙ Installation & Setup
-
-## 1️⃣ Clone Repository
+### 1. Clone
 
 ```bash
-git clone https://github.com/prashantpiyush1111/task-management-system
+git clone https://github.com/prashantpiyush1111/task-management-system.git
+cd task-management-system
 ```
 
----
+### 2. Configure MySQL
 
-## 2️⃣ Open Project
-
-Open the project in:
-
-* IntelliJ IDEA
-* Eclipse
-* VS Code
-
----
-
-## 3️⃣ Configure Database
-
-Update `application-prod.properties`
+Create a database and configure the application's datasource using your local environment/configuration.
 
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/task_management
@@ -238,59 +115,41 @@ spring.datasource.username=root
 spring.datasource.password=your_password
 ```
 
----
+> Keep local credentials and secrets out of version control.
 
-## 4️⃣ Run Application
+### 3. Run
 
 ```bash
 mvn spring-boot:run
 ```
 
----
+## 🔐 Security Notes
 
-# 📈 Future Enhancements
+The application uses Spring Security and JWT-based authentication to protect REST resources. Authorization is applied through role-based access rules so protected operations are available only to permitted users.
 
-* Real-Time Notifications
-* Chat System
-* AI-Based Analytics
-* Mobile Application
-* Cloud Deployment
-* Microservices Architecture
-* Advanced Dashboard
+## 📈 Project Focus
 
----
+This project demonstrates practical experience with:
 
-# 📚 Learning Outcomes
+- REST API design
+- Spring Boot application architecture
+- Authentication and authorization
+- JPA/Hibernate persistence
+- Relational database modeling
+- Modular service/repository design
+- Validation and exception handling
 
-Through this project, practical experience was gained in:
+## 🗺️ Future Enhancements
 
-* Enterprise Backend Development
-* REST API Development
-* JWT Authentication
-* Spring Security
-* Database Relationship Mapping
-* Layered Architecture
-* Secure API Communication
-* Scalable Backend Design
-* Software Engineering Practices
+Potential extensions include richer real-time collaboration, notification workflows, advanced analytics, and additional deployment options.
 
----
+## 👨‍💻 Author
 
-# 💻 GitHub Repository
-
-🔗 https://github.com/prashantpiyush1111/task-management-system
-
----
-
-# 👨‍💻 Author
-
-## Prashant Maurya
-
+**Prashant Maurya**  
 Java Full Stack Developer
-developer 
 
----
+GitHub: [@prashantpiyush1111](https://github.com/prashantpiyush1111)
 
-# ⭐ Conclusion
+## 📄 License
 
-The Task Management System successfully demonstrates the implementation of secure backend development practices, modular architecture design, workflow handling, sprint organization, issue tracking, authentication mechanisms, and enterprise-level REST API development using Java and Spring Boot.
+See the repository license for current usage terms.
